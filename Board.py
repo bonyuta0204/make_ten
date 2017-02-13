@@ -32,9 +32,9 @@ def random_next(max_board):
         max_num = max_board - 2    # 盤面の数字が6以上の時は新しい数字はn-2が上限
 
     prob = {}
+    s = 0
     for i in range(1, max_num + 1):
         prob[i] = max_num + 1 - i
-        s = 0
     for k, p in prob.items():
         s += p
     r = random.uniform(0, s)
@@ -193,5 +193,3 @@ class Board(object):
 
 if __name__ == "__main__":
     x = Board()
-
-

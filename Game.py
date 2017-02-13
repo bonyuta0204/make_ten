@@ -4,10 +4,8 @@
 import copy
 import Board
 import Player
-import matplotlib.pyplot as plt
-import numpy as np
 from pycallgraph import PyCallGraph
-from pycallgraph.output import  GraphvizOutput
+from pycallgraph.output import GraphvizOutput
 
 
 # In[10]:
@@ -41,7 +39,7 @@ class Game(object):
                 if next_c is False:
                     print(u"中断されました")
                     return game_board.board, game_board.turn_number, game_board.max_board()
-                    break
+
                 else:
                     pass
                 game_board.select_cell(next_c)

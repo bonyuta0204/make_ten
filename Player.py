@@ -1,6 +1,5 @@
 # coding: utf-8
 
-# In[5]:
 
 import random
 import numpy as np
@@ -9,8 +8,6 @@ import Game
 import copy
 import matplotlib.pyplot as plt
 
-
-# In[6]:
 
 class Player(object):
     """雛形"""
@@ -34,8 +31,6 @@ class Random(object):
         """boardを受け取り、次に選択するcellの座標をタプルで返す"""
         return random.choice(board.selectable_list())
 
-
-# In[8]:
 
 class Human(object):
     """手動対戦のクラス"""
@@ -65,7 +60,7 @@ class Human(object):
 
 # In[9]:
 
-class Monte_Carlo(object):
+class MonteCarlo(object):
     def __init__(self, repeat=5):
         """repeatの数だけランダム試行を行う
             self.eval_list : list
@@ -85,8 +80,6 @@ class Monte_Carlo(object):
         best_cell = (10, 10)
         for a in board.selectable_list():  # それぞれの選択肢において
             eva = self.monte_eval(a, board_eval)  # その選択肢の評価値
-            eva_turn = eva[0]  # ターン数の評価値
-            eva_max = eva[1]  # 最大値の評価値
 
             if eva[1] > ma[1]:  # 最大の数字が過去最高の時
                 ma = eva
@@ -119,15 +112,15 @@ class Monte_Carlo(object):
 
 
 def main():
-    player = Monte_Carlo(repeat=5)
+    player = MonteCarlo(repeat=5)
     new_game = Game.Game(player)
     new_game.play(show=True)
-    eval = np.array(player.eval_list)
+    result = np.array(player.eval_list)
     plt.subplot(211)
-    plt.plot(eval[:, 0])
+    plt.plot(result[:, 0])
     plt.ylabel("number of remaining turn")
     plt.subplot(212)
-    plt.plot(eval[:, 1])
+    plt.plot(result[:, 1])
     plt.ylabel("max number")
     plt.show()
 
