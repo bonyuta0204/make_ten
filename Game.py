@@ -4,9 +4,6 @@
 import copy
 import Board
 import Player
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
-
 
 # In[10]:
 

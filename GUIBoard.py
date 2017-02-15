@@ -2,8 +2,14 @@
 
 # In[1]:
 
+import sys
 import numpy as np
 import random
+
+from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow, QPushButton, QHBoxLayout, QVBoxLayout)
+from PyQt5.QtGui import QPainter, QColor, QFont
+from PyQt5.QtCore import Qt, QTimer
+import Player
 
 # In[2]:
 
@@ -26,10 +32,10 @@ for i in range(TABLE_SIZE):
 
 def random_next(max_board):
     """盤面の最大の数字がmax_boardのとき、埋める数字から確率的に傾斜をかけてひとつ選び返す"""
-    if max_board <= 5:          # 盤面の数字が5以上の時は新しい数字は3が上限
+    if max_board <= 5:  # 盤面の数字が5以上の時は新しい数字は3が上限
         max_num = 3
     else:
-        max_num = max_board - 2    # 盤面の数字が6以上の時は新しい数字はn-2が上限
+        max_num = max_board - 2  # 盤面の数字が6以上の時は新しい数字はn-2が上限
 
     prob = {}
     s = 0
@@ -45,20 +51,144 @@ def random_next(max_board):
             return k
 
 
-# In[24]:
+# デバッグ用
 
-class Board(object):
+class App(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.board = Board()
+
+        self.init_ui()
+
+    def init_ui(self):
+        self.setGeometry(300, 300, 1000, 600)
+        self.setWindowTitle("Board Test")
+
+        start_btn = QPushButton("start")
+        start_btn.clicked.connect(self.board.start)
+
+        reset_btn = QPushButton("Reset")
+        reset_btn.clicked.connect(self.board.init_board)
+
+        vbox_btn = QVBoxLayout()
+        vbox_btn.addStretch(1)
+        vbox_btn.addWidget(start_btn)
+        vbox_btn.addWidget(reset_btn)
+
+        vbox_board = QVBoxLayout()
+        vbox_board.addWidget(self.board)
+
+        hbox = QHBoxLayout()
+        hbox.addLayout(vbox_board)
+        hbox.addLayout(vbox_btn)
+
+
+
+        self.setLayout(hbox)
+
+        self.show()
+
+
+# デバッグ用ここまで
+
+class Board(QFrame):
     """盤面のクラス"""
 
+    # Class Constant
+    BOARD_SIZE = 500
+
     def __init__(self):
-        """盤面の初期化。完全ランダムで埋める"""
-        self.board = np.zeros((TABLE_SIZE, TABLE_SIZE), dtype=np.int32)
+        """盤面の初期化。完全ランダムで埋める.Playerの選択も"""
+        super().__init__()
+
+        self.init_board()
+
+    def init_board(self):
+        self.board = []
+        self._init_board()
         self.selectable = self.__selectable_list()
+        self.turn_number = 0
+        self.player = Player.MonteCarlo(repeat=10)
+        self.resize(500, 500)
+
+    def step(self):
+        """step one turn"""
+
+        if not self.is_game_end():
+            next_c = self.player.next_cell(self)
+            self.select_cell(next_c)
+
+        else:
+            print(self.turn_number)
+            self.timer.stop()
+        self.update()
+
+    def get_input(self):
+        pass
+
+    def start(self):
+        self.timer = QTimer(self)
+        self.timer.setInterval(10)
+        self.timer.timeout.connect(self.update)
+        self.timer.timeout.connect(self.step)
+        self.timer.start()
+
+    def mousePressEvent(self, event):
+        """when mouse clicked"""
+        self.mouse_step(event.x(), event.y())
+
+    def mouse_step(self, x, y):
+        """select cell which is clicked by mouse"""
+        cell = 0
+        cell_size = self._get_cell_size()
         for i in range(TABLE_SIZE):
             for j in range(TABLE_SIZE):
-                self.board[i, j] = random.randint(1, 3)
-        self.turn_number = 0
+                if j * cell_size <= x < (j + 1) * cell_size:
+                    if i * cell_size <= y < (i + 1) * cell_size:
+                        cell = (i, j)
+        if cell in self.selectable_list():
+            if not self.is_game_end():
+                next_c = cell
+                self.select_cell(next_c)
+                self.update()
 
+
+
+    def init_ui(self):
+        self.resize(Board.BOARD_SIZE, Board.BOARD_SIZE)
+
+    def _get_cell_size(self):
+        return 500 // TABLE_SIZE
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        print("QpainterCalled")
+        for i in range(TABLE_SIZE):
+            for j in range(TABLE_SIZE):
+                self._draw_a_cell(painter, i, j, self.board[i][j])
+
+    def _draw_a_cell(self, painter, i, j, value):
+        """Draw cell(i, j), value is the number of the cell"""
+        colorTable = [0x000000, 0xCC6666, 0x66CC66, 0x6666CC,
+                      0xCCCC66, 0xCC66CC, 0x66CCCC, 0xDAAA00, "black", "green", "yellow", "orange"]
+
+        color = QColor(colorTable[value])
+        painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size() - 1,
+                         self._get_cell_size() - 1, color)
+
+        font = QFont("Times", 40)
+        painter.setFont(font)
+        pen_color = QColor("white")
+        painter.setPen(pen_color)
+        painter.drawText(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size() - 1,
+                         self._get_cell_size() - 1,
+                         Qt.AlignCenter, str(value))
+
+    def _init_board(self):
+        self.board = [[0] * TABLE_SIZE for i in range(TABLE_SIZE)]
+        for i in range(TABLE_SIZE):
+            for j in range(TABLE_SIZE):
+                self.board[i][j] = random.randint(1, 3)
 
     def select_cell(self, cell):
         """セルを選択し、消去。その後下に落とし新しいところは埋める"""
@@ -183,6 +313,7 @@ class Board(object):
         return x, y
 
 
-
 if __name__ == "__main__":
-    x = Board()
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())

@@ -7,6 +7,7 @@ import Board
 import Game
 import copy
 import matplotlib.pyplot as plt
+import GUIBoard
 
 
 class Player(object):
