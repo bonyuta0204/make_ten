@@ -13,7 +13,7 @@ import Player
 
 # In[2]:
 
-TABLE_SIZE = 4
+TABLE_SIZE = 5
 ALL_CELLS = []
 for x in range(TABLE_SIZE):
     for y in range(TABLE_SIZE):

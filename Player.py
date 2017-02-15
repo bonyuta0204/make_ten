@@ -85,12 +85,12 @@ class MonteCarlo(object):
             if eva[1] > ma[1]:  # 最大の数字が過去最高の時
                 ma = eva
                 best_cell = a
-                print(a, ma)
+
             elif eva[1] == ma[1]:  # 最大の数字が同列一位の時はターン数が多い方を優先
                 if eva[0] > ma[0]:
                     ma = eva
                     best_cell = a
-                    print(a, ma)
+
             else:
                 pass
 
