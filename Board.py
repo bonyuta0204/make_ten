@@ -5,9 +5,10 @@
 import numpy as np
 import random
 
+
 # In[2]:
 
-TABLE_SIZE = 4
+TABLE_SIZE = 5
 ALL_CELLS = []
 for x in range(TABLE_SIZE):
     for y in range(TABLE_SIZE):
@@ -53,21 +54,20 @@ class Board(object):
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める"""
         self.board = np.zeros((TABLE_SIZE, TABLE_SIZE), dtype=np.int32)
-        self.selectable = self.__selectable_list()
+
         for i in range(TABLE_SIZE):
             for j in range(TABLE_SIZE):
                 self.board[i, j] = random.randint(1, 3)
+        self.selectable = self.__selectable_list()
         self.turn_number = 0
-
 
     def select_cell(self, cell):
         """セルを選択し、消去。その後下に落とし新しいところは埋める"""
-        i, j = cell[0], cell[1]
-        init_cell = self.board[i][j]
+        init_cell = self.board[cell]
         self.__connect(cell)
-        self.__erase_connected()
+        self.__erace_connected()
         if self.con_list:
-            self.board[i][j] = init_cell + 1
+            self.board[cell] = init_cell + 1
             self.__drop()
         self.__renew_board()
         self.turn_number += 1
@@ -75,6 +75,15 @@ class Board(object):
 
     def selectable_list(self):
         return self.selectable
+
+    def play_game(self):
+        """ゲームをプレイする。入力はx座標y座標を一個ずつ打ち込む。終わり判定なし。10ターンで終了"""
+        n = 0
+        while n < 10:
+            self.print_board()
+            cell = self.__get_valid_input()
+            self.select_cell(cell)
+            n += 1
 
     def print_board(self):
         """ボードを表示する。座標番号つき"""
@@ -86,8 +95,9 @@ class Board(object):
         for i in range(TABLE_SIZE):
             s = str(i)
             for j in range(TABLE_SIZE):
-                s = s + " " + str(self.board[i][j])
+                s = s + " " + str(self.board[i, j])
             print(s)
+
 
     def __selectable_list(self):
         """選べる場所の集合.おける座標をタプルのセットで返す"""
@@ -95,10 +105,11 @@ class Board(object):
         for cell in ALL_CELLS:
             if cell not in l:
                 for adj in ADJECENT[cell]:
-                    if self.board[adj[0]][adj[1]] == self.board[cell[0]][cell[1]]:
+                    if self.board[adj] == self.board[cell]:
                         l.append(cell)
                         l.append(adj)
-        return l
+                        break
+        return list(set(l))
 
     def is_game_end(self):
         """おける場所がなくゲーム終了の場合にTrue,ゲームが続く場合Falseを返す"""
@@ -112,8 +123,8 @@ class Board(object):
         """盤面の中で最大の値を返す"""
         ma = -1
         for cell in ALL_CELLS:
-            if self.board[cell[0]][cell[1]] >= ma:
-                ma = self.board[cell[0]][cell[1]]
+                if self.board[cell] >= ma:
+                    ma = self.board[cell]
         return ma
 
     def __connected(self, cell):
@@ -122,7 +133,7 @@ class Board(object):
         # cell is given as tuple
         for x in ADJECENT[cell]:
             if x not in self.con_list:
-                if self.board[cell[0]][cell[1]] == self.board[x[0]][x[1]]:
+                if self.board[cell] == self.board[x]:
                     self.con_list.append(x)
                     self.__connected(x)
 
@@ -132,33 +143,35 @@ class Board(object):
         self.con_list = []
         self.__connected(cell)
 
-    def __erase_connected(self):
+    def __erace_connected(self):
         """つながっている部分をすべて0に変える"""
         for x in self.con_list:
-            self.board[x[0]][x[1]] = 0
+            self.board[x] = 0
 
     def __drop(self):
 
         """0に変えた後0を消して上にある数字を下に落下させる"""
+
         for i in range(TABLE_SIZE):
             # move column i
             new_column = []
             for j in range(TABLE_SIZE):
-                if self.board[j][i] != 0:  # i列の０を除いたリスト上→下と右→左が対応
-                    new_column.append(self.board[j][i])
+                if self.board[j, i] != 0:  # i列の０を除いたリスト上→下と右→左が対応
+                    new_column.append(self.board[j, i])
+
             for k in range(-1, -TABLE_SIZE - 1, -1):
                 try:
-                    self.board[k][i] = new_column[k]
+                    self.board[k, i] = new_column[k]
                 except IndexError:
-                    self.board[k][i] = 0
+                    self.board[k,  i] = 0
+
 
     def __renew_board(self):
         """0になっているところをランダムに埋める"""
         max_board = self.max_board()
-        for i in range(TABLE_SIZE):
-            for j in range(TABLE_SIZE):
-                if self.board[i][j] == 0:
-                    self.board[i][j] = random_next(max_board)
+        for cell in ALL_CELLS:
+            if self.board[cell] == 0:
+                self.board[cell] = random_next(max_board)
 
     def __get_valid_input(self):
         """入力をうけとりタプルで返す。"""
@@ -184,9 +197,16 @@ class Board(object):
                 print("type an integer")
         return x, y
 
-def test():
+def test(n):
+    for i in range(n):
+        board = Board()
+        board.select_cell(board.selectable_list()[0])
+def main():
     board = Board()
     board.select_cell(board.selectable_list()[0])
+    print(board.board, board.selectable_list())
+
+# In[4]:
 
 if __name__ == "__main__":
-    test()
+    main()
