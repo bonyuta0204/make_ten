@@ -7,7 +7,7 @@ import random
 
 # In[2]:
 
-TABLE_SIZE = 5
+TABLE_SIZE = 4
 ALL_CELLS = []
 for x in range(TABLE_SIZE):
     for y in range(TABLE_SIZE):
@@ -93,9 +93,11 @@ class Board(object):
         """選べる場所の集合.おける座標をタプルのセットで返す"""
         l = []
         for cell in ALL_CELLS:
-            for adj in ADJECENT[cell]:
-                if self.board[adj[0]][adj[1]] == self.board[cell[0]][cell[1]]:
-                    l.append(cell)
+            if cell not in l:
+                for adj in ADJECENT[cell]:
+                    if self.board[adj[0]][adj[1]] == self.board[cell[0]][cell[1]]:
+                        l.append(cell)
+                        l.append(adj)
         return l
 
     def is_game_end(self):
@@ -119,10 +121,10 @@ class Board(object):
         """選択したCellと同じ数字でつながっているCellの座標を返す。途中で使う用。"""
         # cell is given as tuple
         for x in ADJECENT[cell]:
-
-            if self.board[cell[0]][cell[1]] == self.board[x[0]][x[1]] and x not in self.con_list:
-                self.con_list.append(x)
-                self.__connected(x)
+            if x not in self.con_list:
+                if self.board[cell[0]][cell[1]] == self.board[x[0]][x[1]]:
+                    self.con_list.append(x)
+                    self.__connected(x)
 
     def __connect(self, cell):
 
@@ -182,7 +184,9 @@ class Board(object):
                 print("type an integer")
         return x, y
 
-
+def test():
+    board = Board()
+    board.select_cell(board.selectable_list()[0])
 
 if __name__ == "__main__":
-    x = Board()
+    test()
