@@ -112,6 +112,7 @@ class MonteCarlo(object):
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
         return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
 
+
 class MonteCarloSecond(object):
     def __init__(self, second=1.0):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
@@ -121,7 +122,7 @@ class MonteCarloSecond(object):
         self.second = second
         self.eval_list = []
         self.game_num = 0
-        self.num_try = []     # 何手目で平均何回プレーしたかの記録
+        self.num_try = []  # 何手目で平均何回プレーしたかの記録
 
     def next_cell(self, board):
         """モンテカルロ法の評価値が一番高かった手を返す。"""
@@ -159,7 +160,7 @@ class MonteCarloSecond(object):
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
         start_time = time.clock()
-        while time.clock() - start_time < self.second_each_ :
+        while time.clock() - start_time < self.second_each_:
             new_board = Board.Board()
             new_board.board = copy.deepcopy(current_board.board)
             new_board.select_cell(cell)
@@ -172,23 +173,34 @@ class MonteCarloSecond(object):
         return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
 
 
-
 def main():
-    player = MonteCarloSecond(second=0.5)
+    player1 = MonteCarloSecond(second=3)
+    new_game = Game.Game(player1)
+    new_game.play(show=True)
+    result = np.array(player1.eval_list)
+    print(result)
+    plt.subplot(211)
+    plt.plot(result[:, 0], label="MonteCarloSecond(%f)" % player1.second)
+
+    plt.subplot(212)
+    plt.plot(result[:, 1], label="MonteCarloSecond(%f)" % player1.second)
+
+    player = MonteCarlo(repeat=20)
     new_game = Game.Game(player)
     new_game.play(show=True)
     result = np.array(player.eval_list)
-    num_try = np.array(player.num_try)
+    print(result)
     plt.subplot(211)
-    #plt.plot(result[:, 0])
-    #plt.ylabel("number of remaining turn")
-
-    plt.plot(result[:, 1])
-    plt.ylabel("max number")
-    plt.subplot(212)
-    plt.plot(num_try)
-    plt.ylabel("average number of game played to estimate")
+    plt.plot(result[:, 0], label="MonteCarlo(%d)" % player.repeat)
+    plt.ylabel("number of remaining turn")
     plt.grid(True)
+    plt.legend(loc="best")
+    plt.subplot(212)
+    plt.plot(result[:, 1], label="MonteCarlo(%d)" % player.repeat)
+    plt.ylabel("max number")
+    plt.grid(True)
+    plt.legend(loc="best")
+
     plt.show()
 
 

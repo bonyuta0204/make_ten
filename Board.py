@@ -4,11 +4,11 @@
 
 import numpy as np
 import random
-
+import copy
 
 # In[2]:
 
-TABLE_SIZE = 5
+TABLE_SIZE = 4
 ALL_CELLS = []
 for x in range(TABLE_SIZE):
     for y in range(TABLE_SIZE):
@@ -27,10 +27,10 @@ for i in range(TABLE_SIZE):
 
 def random_next(max_board):
     """盤面の最大の数字がmax_boardのとき、埋める数字から確率的に傾斜をかけてひとつ選び返す"""
-    if max_board <= 5:          # 盤面の数字が5以上の時は新しい数字は3が上限
+    if max_board <= 5:  # 盤面の数字が5以上の時は新しい数字は3が上限
         max_num = 3
     else:
-        max_num = max_board - 2    # 盤面の数字が6以上の時は新しい数字はn-2が上限
+        max_num = max_board - 2  # 盤面の数字が6以上の時は新しい数字はn-2が上限
 
     prob = {}
     s = 0
@@ -61,17 +61,32 @@ class Board(object):
         self.selectable = self.__selectable_list()
         self.turn_number = 0
 
+    def clone(self):
+        new_board = Board()
+        new_board.board = copy.deepcopy(self.board)
+        new_board.con_list = copy.deepcopy(self.con_list)
+        new_board.selectable = copy.deepcopy(self.selectable)
+        new_board.turn_number = self.turn_number
+
+        return new_board
+
     def select_cell(self, cell):
-        """セルを選択し、消去。その後下に落とし新しいところは埋める"""
+        """セルを選択し、消去。その後下に落とし新しいところは埋める. Dropする前のBoardを返す"""
         init_cell = self.board[cell]
         self.__connect(cell)
         self.__erace_connected()
+
         if self.con_list:
             self.board[cell] = init_cell + 1
+            before_drop = self.clone()
             self.__drop()
+        else:
+            before_drop = self.clone()
         self.__renew_board()
         self.turn_number += 1
         self.selectable = self.__selectable_list()
+
+        return before_drop
 
     def selectable_list(self):
         return self.selectable
@@ -98,7 +113,6 @@ class Board(object):
                 s = s + " " + str(self.board[i, j])
             print(s)
 
-
     def __selectable_list(self):
         """選べる場所の集合.おける座標をタプルのセットで返す"""
         l = []
@@ -123,8 +137,8 @@ class Board(object):
         """盤面の中で最大の値を返す"""
         ma = -1
         for cell in ALL_CELLS:
-                if self.board[cell] >= ma:
-                    ma = self.board[cell]
+            if self.board[cell] >= ma:
+                ma = self.board[cell]
         return ma
 
     def __connected(self, cell):
@@ -163,8 +177,7 @@ class Board(object):
                 try:
                     self.board[k, i] = new_column[k]
                 except IndexError:
-                    self.board[k,  i] = 0
-
+                    self.board[k, i] = 0
 
     def __renew_board(self):
         """0になっているところをランダムに埋める"""
@@ -197,14 +210,18 @@ class Board(object):
                 print("type an integer")
         return x, y
 
+
 def test(n):
     for i in range(n):
         board = Board()
         board.select_cell(board.selectable_list()[0])
+
+
 def main():
     board = Board()
     board.select_cell(board.selectable_list()[0])
     print(board.board, board.selectable_list())
+
 
 # In[4]:
 
