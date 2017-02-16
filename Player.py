@@ -7,7 +7,7 @@ import Board
 import Game
 import copy
 import matplotlib.pyplot as plt
-import GUIBoard
+import time
 
 
 class Player(object):
@@ -95,6 +95,7 @@ class MonteCarlo(object):
                 pass
 
         self.eval_list.append(ma)
+
         return best_cell
 
     def monte_eval(self, cell, current_board):
@@ -111,18 +112,83 @@ class MonteCarlo(object):
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
         return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
 
+class MonteCarloSecond(object):
+    def __init__(self, second=1.0):
+        """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
+            self.eval_list : list
+                プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
+        """
+        self.second = second
+        self.eval_list = []
+        self.game_num = 0
+        self.num_try = []     # 何手目で平均何回プレーしたかの記録
+
+    def next_cell(self, board):
+        """モンテカルロ法の評価値が一番高かった手を返す。"""
+        # 評価用に新しいBoardをつくる
+        board_eval = Board.Board()
+        board_eval.board = copy.deepcopy(board.board)
+        self.num_selectable_ = len(board.selectable_list())
+        self.second_each_ = self.second / float(self.num_selectable_)
+
+        # board_evalを使って実験をする
+        ma = (-1, -1)
+        best_cell = (10, 10)
+        for a in board.selectable_list():  # それぞれの選択肢において
+            self.repeat = 0
+            eva = self.monte_eval(a, board_eval)  # その選択肢の評価値
+
+            if eva[1] > ma[1]:  # 最大の数字が過去最高の時
+                ma = eva
+                best_cell = a
+
+            elif eva[1] == ma[1]:  # 最大の数字が同列一位の時はターン数が多い方を優先
+                if eva[0] > ma[0]:
+                    ma = eva
+                    best_cell = a
+
+            else:
+                pass
+
+        self.eval_list.append(ma)
+        self.num_try.append(float(self.repeat / self.num_selectable_))
+        return best_cell
+
+    def monte_eval(self, cell, current_board):
+        """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
+        result_max = []  # 最大値のリスト
+        result_turn = []  # ターン数のリスト
+        start_time = time.clock()
+        while time.clock() - start_time < self.second_each_ :
+            new_board = Board.Board()
+            new_board.board = copy.deepcopy(current_board.board)
+            new_board.select_cell(cell)
+            result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
+            result_max.append(result[2])
+            result_turn.append(result[1])
+            self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
+            self.repeat += 1
+
+        return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
+
+
 
 def main():
-    player = MonteCarlo(repeat=5)
+    player = MonteCarloSecond(second=0.5)
     new_game = Game.Game(player)
     new_game.play(show=True)
     result = np.array(player.eval_list)
+    num_try = np.array(player.num_try)
     plt.subplot(211)
-    plt.plot(result[:, 0])
-    plt.ylabel("number of remaining turn")
-    plt.subplot(212)
+    #plt.plot(result[:, 0])
+    #plt.ylabel("number of remaining turn")
+
     plt.plot(result[:, 1])
     plt.ylabel("max number")
+    plt.subplot(212)
+    plt.plot(num_try)
+    plt.ylabel("average number of game played to estimate")
+    plt.grid(True)
     plt.show()
 
 

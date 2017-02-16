@@ -11,8 +11,6 @@ from PyQt5.QtCore import Qt, QTimer
 import Player
 
 
-# デバッグ用
-
 class App(QWidget):
     def __init__(self):
         super().__init__()
@@ -47,8 +45,6 @@ class App(QWidget):
         self.show()
 
 
-# デバッグ用ここまで
-
 class GUIBoard(QFrame):
     """盤面のクラス"""
 
@@ -64,7 +60,7 @@ class GUIBoard(QFrame):
 
     def init_board(self):
         self.Board = Board.Board()
-        self.player = Player.MonteCarlo(repeat=5)
+        self.player = Player.MonteCarloSecond(second=2)
         self.resize(500, 500)
 
     def step(self):
