@@ -5,7 +5,6 @@ import random
 import numpy as np
 import Board
 import Game
-import copy
 import matplotlib.pyplot as plt
 import time
 
@@ -66,6 +65,8 @@ class MonteCarlo(object):
         """repeatの数だけランダム試行を行う
             self.eval_list : list
                 プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
+            self.game_num : int
+                プレイしたゲーム数の合計
         """
         self.repeat = repeat
         self.eval_list = []
@@ -75,7 +76,7 @@ class MonteCarlo(object):
         """モンテカルロ法の評価値が一番高かった手を返す。"""
         # 評価用に新しいBoardをつくる
         board_eval = Board.Board()
-        board_eval.board = copy.deepcopy(board.board)
+        board_eval.board = np.copy(board.board)
         # board_evalを使って実験をする
         ma = (-1, -1)
         best_cell = (10, 10)
@@ -104,7 +105,7 @@ class MonteCarlo(object):
         result_turn = []  # ターン数のリスト
         for i in range(self.repeat):  # 毎回インスタンスを生成しないといけない？タプルにすれば大丈夫？
             new_board = Board.Board()
-            new_board.board = copy.deepcopy(current_board.board)
+            new_board.board = np.copy(current_board.board)
             new_board.select_cell(cell)
             result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
             result_max.append(result[2])
@@ -118,6 +119,10 @@ class MonteCarloSecond(object):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             self.eval_list : list
                 プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
+            self.game_num : int
+                合計で何ゲームプレイしたか
+            self.num_try: list
+                それぞれの局面で平均何回プレーして期待値をもとめたかのリスト
         """
         self.second = second
         self.eval_list = []
@@ -125,10 +130,12 @@ class MonteCarloSecond(object):
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
 
     def next_cell(self, board):
-        """モンテカルロ法の評価値が一番高かった手を返す。"""
+        """モンテカルロ法の評価値が一番高かった手を返す
+
+        。"""
         # 評価用に新しいBoardをつくる
         board_eval = Board.Board()
-        board_eval.board = copy.deepcopy(board.board)
+        board_eval.board = np.copy(board.board)
         self.num_selectable_ = len(board.selectable_list())
         self.second_each_ = self.second / float(self.num_selectable_)
 
@@ -162,7 +169,7 @@ class MonteCarloSecond(object):
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
             new_board = Board.Board()
-            new_board.board = copy.deepcopy(current_board.board)
+            new_board.board = np.copy(current_board.board)
             new_board.select_cell(cell)
             result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
             result_max.append(result[2])
@@ -174,22 +181,23 @@ class MonteCarloSecond(object):
 
 
 def main():
-    player1 = MonteCarloSecond(second=3)
+
+    player1 = MonteCarloSecond(second=1)
     new_game = Game.Game(player1)
     new_game.play(show=True)
     result = np.array(player1.eval_list)
-    print(result)
+    print("MonteCarloSecond(%f)" % player1.second, player1.game_num)
     plt.subplot(211)
     plt.plot(result[:, 0], label="MonteCarloSecond(%f)" % player1.second)
 
     plt.subplot(212)
     plt.plot(result[:, 1], label="MonteCarloSecond(%f)" % player1.second)
 
-    player = MonteCarlo(repeat=20)
+    player = MonteCarlo(repeat=10)
     new_game = Game.Game(player)
     new_game.play(show=True)
     result = np.array(player.eval_list)
-    print(result)
+    print("MonteCarlo(%d)" % player.repeat , player.game_num)
     plt.subplot(211)
     plt.plot(result[:, 0], label="MonteCarlo(%d)" % player.repeat)
     plt.ylabel("number of remaining turn")

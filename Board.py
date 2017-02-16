@@ -4,11 +4,10 @@
 
 import numpy as np
 import random
-import copy
 
 # In[2]:
 
-TABLE_SIZE = 4
+TABLE_SIZE = 5
 ALL_CELLS = []
 for x in range(TABLE_SIZE):
     for y in range(TABLE_SIZE):
@@ -53,24 +52,20 @@ class Board(object):
 
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める"""
-        self.board = np.zeros((TABLE_SIZE, TABLE_SIZE), dtype=np.int32)
 
-        for i in range(TABLE_SIZE):
-            for j in range(TABLE_SIZE):
-                self.board[i, j] = random.randint(1, 3)
-        self.selectable = self.__selectable_list()
+        self.board = np.random.randint(1, 4, size=(TABLE_SIZE, TABLE_SIZE), dtype=np.int8)
+        self.selectable = None
         self.turn_number = 0
 
     def clone(self):
+        """Boardのコピー"""
         new_board = Board()
-        new_board.board = copy.deepcopy(self.board)
-        new_board.con_list = copy.deepcopy(self.con_list)
-        new_board.selectable = copy.deepcopy(self.selectable)
+        new_board.board = np.copy(self.board)
         new_board.turn_number = self.turn_number
 
         return new_board
 
-    def select_cell(self, cell):
+    def select_cell(self, cell, return_board_before_drop=False):
         """セルを選択し、消去。その後下に落とし新しいところは埋める. Dropする前のBoardを返す"""
         init_cell = self.board[cell]
         self.__connect(cell)
@@ -78,17 +73,22 @@ class Board(object):
 
         if self.con_list:
             self.board[cell] = init_cell + 1
-            before_drop = self.clone()
+            if return_board_before_drop:
+                before_drop = self.clone()
             self.__drop()
         else:
-            before_drop = self.clone()
+            if return_board_before_drop:
+                before_drop = self.clone()
         self.__renew_board()
         self.turn_number += 1
         self.selectable = self.__selectable_list()
-
-        return before_drop
+        if return_board_before_drop:
+            return before_drop
 
     def selectable_list(self):
+        if self.selectable is None:
+            self.selectable = self.__selectable_list()
+
         return self.selectable
 
     def play_game(self):
@@ -112,6 +112,8 @@ class Board(object):
             for j in range(TABLE_SIZE):
                 s = s + " " + str(self.board[i, j])
             print(s)
+    def get_board(self):
+        return np.copy(self.board)
 
     def __selectable_list(self):
         """選べる場所の集合.おける座標をタプルのセットで返す"""
@@ -135,11 +137,8 @@ class Board(object):
 
     def max_board(self):
         """盤面の中で最大の値を返す"""
-        ma = -1
-        for cell in ALL_CELLS:
-            if self.board[cell] >= ma:
-                ma = self.board[cell]
-        return ma
+
+        return np.amax(self.board)
 
     def __connected(self, cell):
 

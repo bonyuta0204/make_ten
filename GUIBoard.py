@@ -65,7 +65,7 @@ class GUIBoard(QFrame):
 
     def init_board(self):
         self.Board = Board.Board()
-        self.player = Player.MonteCarloSecond(second=2)
+        self.player = Player.MonteCarloSecond(second=0.5)
         self.ispaused = True
         self.resize(500, 500)
         self.Board_drawn = self.Board
@@ -81,7 +81,7 @@ class GUIBoard(QFrame):
                 next_c = self.player.next_cell(self.Board)
 
                 # draw before_drop
-                self.Board_drawn = self.Board.select_cell(next_c)
+                self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
                 self.drop_timer.start()
 
                 # draw after_drop
@@ -131,7 +131,7 @@ class GUIBoard(QFrame):
             if not self.Board.is_game_end():
                 next_c = cell
 
-                self.Board_drawn = self.Board.select_cell(next_c)
+                self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
                 self.drop_timer.start()
                 self.update()
 
