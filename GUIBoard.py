@@ -5,7 +5,9 @@
 import sys
 import Board
 
-from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow, QPushButton, QHBoxLayout, QVBoxLayout)
+from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow,
+                             QPushButton, QHBoxLayout, QVBoxLayout, QLabel,
+                             QComboBox, QGroupBox, QLineEdit, QGridLayout)
 from PyQt5.QtGui import QPainter, QColor, QFont
 from PyQt5.QtCore import Qt, QTimer
 import time
@@ -22,6 +24,44 @@ class App(QWidget):
     def init_ui(self):
         self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Board Test")
+        self.Board = GUIBoard()
+        # label for turn
+        turn_label = QLabel("Turn")
+        # label for game over
+
+        is_game_over_label = QLabel("Game Over")
+
+        # combobox to select Ai
+
+        select_AI = QComboBox()
+        select_AI.addItem("Random")
+        select_AI.addItem("MonteCarlo")
+        select_AI.addItem("MonteCarloSecond")
+        select_AI.currentTextChanged.connect(self.combobox_change)
+        # label for parameter
+
+        self.parameter = QLabel("second")
+
+        # line edotor for paramater of ai
+        self.line_edit = QLineEdit()
+        self.line_edit.textChanged.connect(self.line_edit_change)
+
+        # GroupBox for AI
+
+
+        AI_box = QGroupBox()
+        AI_layout = QGridLayout()
+
+
+
+
+        AI_layout.addWidget(select_AI, 0, 0, 1, 2)
+        AI_layout.addWidget(self.parameter, 1, 0)
+        AI_layout.addWidget(self.line_edit, 1, 1)
+
+        AI_box.setLayout(AI_layout)
+
+        # buttons
 
         start_btn = QPushButton("start")
         start_btn.clicked.connect(self.board.start)
@@ -32,22 +72,62 @@ class App(QWidget):
         pause_btn = QPushButton("Pause")
         pause_btn.clicked.connect(self.board.pause)
 
-        vbox_btn = QVBoxLayout()
-        vbox_btn.addStretch(1)
-        vbox_btn.addWidget(pause_btn)
-        vbox_btn.addWidget(start_btn)
-        vbox_btn.addWidget(reset_btn)
+        # GroupBox for Buttons
 
-        vbox_board = QVBoxLayout()
-        vbox_board.addWidget(self.board)
+        buttons_box = QGroupBox()
+        buttons_layout = QHBoxLayout()
 
+        buttons_layout.addWidget(start_btn)
+        buttons_layout.addWidget(reset_btn)
+        buttons_layout.addWidget(pause_btn)
+
+        buttons_box.setLayout(buttons_layout)
+
+        # V box
+
+        tool_box = QGroupBox()
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(turn_label)
+        vbox.addWidget(is_game_over_label)
+        vbox.addStretch(1)
+        vbox.addWidget(AI_box)
+        vbox.addStretch(1)
+        vbox.addWidget(buttons_box)
+
+        tool_box.setLayout(vbox)
+
+        # board
         hbox = QHBoxLayout()
-        hbox.addLayout(vbox_board)
-        hbox.addLayout(vbox_btn)
+        hbox.addWidget(self.board, stretch=2)
+        hbox.addWidget(tool_box, stretch=1)
 
         self.setLayout(hbox)
 
+        self.board.player = Player.Random()
         self.show()
+
+    def combobox_change(self, text):
+        """      select_AI.addItem("Random")
+        select_AI.addItem("MonteCarlo")
+        select_AI.addItem("MonteCarloSecond")"""
+        if text == "Random":
+            self.board.player = Player.Random()
+            self.parameter.setText("No Parameter")
+        if text == "MonteCarlo":
+            self.board.player = Player.MonteCarlo()
+            self.parameter.setText("Repeat Number")
+        if text == "MonteCarloSecond":
+            self.board.player = Player.MonteCarloSecond()
+            self.parameter.setText("Second per a turn")
+
+    def line_edit_change(self, text):
+        try:
+            parameter = int(text)
+            self.board.player.parameter = parameter
+        except ValueError:
+            self.line_edit.clear()
+
 
 
 class GUIBoard(QFrame):
@@ -65,7 +145,7 @@ class GUIBoard(QFrame):
 
     def init_board(self):
         self.Board = Board.Board()
-        self.player = Player.MonteCarloSecond(second=0.5)
+        #self.player = Player.MonteCarloSecond(second=1)
         self.ispaused = True
         self.resize(500, 500)
         self.Board_drawn = self.Board

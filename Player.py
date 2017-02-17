@@ -68,7 +68,7 @@ class MonteCarlo(object):
             self.game_num : int
                 プレイしたゲーム数の合計
         """
-        self.repeat = repeat
+        self.parameter = repeat
         self.eval_list = []
         self.game_num = 0
 
@@ -103,7 +103,7 @@ class MonteCarlo(object):
         """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
-        for i in range(self.repeat):  # 毎回インスタンスを生成しないといけない？タプルにすれば大丈夫？
+        for i in range(self.parameter):  # 毎回インスタンスを生成しないといけない？タプルにすれば大丈夫？
             new_board = Board.Board()
             new_board.board = np.copy(current_board.board)
             new_board.select_cell(cell)
@@ -124,7 +124,7 @@ class MonteCarloSecond(object):
             self.num_try: list
                 それぞれの局面で平均何回プレーして期待値をもとめたかのリスト
         """
-        self.second = second
+        self.parameter = second
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
@@ -137,7 +137,7 @@ class MonteCarloSecond(object):
         board_eval = Board.Board()
         board_eval.board = np.copy(board.board)
         self.num_selectable_ = len(board.selectable_list())
-        self.second_each_ = self.second / float(self.num_selectable_)
+        self.second_each_ = self.parameter / float(self.num_selectable_)
 
         # board_evalを使って実験をする
         ma = (-1, -1)
@@ -186,25 +186,25 @@ def main():
     new_game = Game.Game(player1)
     new_game.play(show=True)
     result = np.array(player1.eval_list)
-    print("MonteCarloSecond(%f)" % player1.second, player1.game_num)
+    print("MonteCarloSecond(%f)" % player1.parameter, player1.game_num)
     plt.subplot(211)
-    plt.plot(result[:, 0], label="MonteCarloSecond(%f)" % player1.second)
+    plt.plot(result[:, 0], label="MonteCarloSecond(%f)" % player1.parameter)
 
     plt.subplot(212)
-    plt.plot(result[:, 1], label="MonteCarloSecond(%f)" % player1.second)
+    plt.plot(result[:, 1], label="MonteCarloSecond(%f)" % player1.parameter)
 
     player = MonteCarlo(repeat=10)
     new_game = Game.Game(player)
     new_game.play(show=True)
     result = np.array(player.eval_list)
-    print("MonteCarlo(%d)" % player.repeat , player.game_num)
+    print("MonteCarlo(%d)" % player.parameter, player.game_num)
     plt.subplot(211)
-    plt.plot(result[:, 0], label="MonteCarlo(%d)" % player.repeat)
+    plt.plot(result[:, 0], label="MonteCarlo(%d)" % player.parameter)
     plt.ylabel("number of remaining turn")
     plt.grid(True)
     plt.legend(loc="best")
     plt.subplot(212)
-    plt.plot(result[:, 1], label="MonteCarlo(%d)" % player.repeat)
+    plt.plot(result[:, 1], label="MonteCarlo(%d)" % player.parameter)
     plt.ylabel("max number")
     plt.grid(True)
     plt.legend(loc="best")
