@@ -9,27 +9,31 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow,
                              QPushButton, QHBoxLayout, QVBoxLayout, QLabel,
                              QComboBox, QGroupBox, QLineEdit, QGridLayout)
 from PyQt5.QtGui import QPainter, QColor, QFont
-from PyQt5.QtCore import Qt, QTimer
-import time
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 import Player
 
 
 class App(QWidget):
+
+
     def __init__(self):
         super().__init__()
-        self.board = GUIBoard()
+        self.GUIBoard = GUIBoard()
 
         self.init_ui()
 
     def init_ui(self):
         self.setGeometry(300, 300, 1000, 600)
         self.setWindowTitle("Board Test")
-        self.Board = GUIBoard()
+
         # label for turn
-        turn_label = QLabel("Turn")
+        self.turn_label = QLabel("Turn")
+        # signal
+        self.GUIBoard.turn_change.connect(self.renew_turn)
+        self.GUIBoard.is_game_end.connect(self.game_over)
         # label for game over
 
-        is_game_over_label = QLabel("Game Over")
+        self.is_game_over_label = QLabel("")
 
         # combobox to select Ai
 
@@ -64,13 +68,13 @@ class App(QWidget):
         # buttons
 
         start_btn = QPushButton("start")
-        start_btn.clicked.connect(self.board.start)
+        start_btn.clicked.connect(self.GUIBoard.start)
 
         reset_btn = QPushButton("Reset")
-        reset_btn.clicked.connect(self.board.init_board)
+        reset_btn.clicked.connect(self.GUIBoard.init_board)
 
         pause_btn = QPushButton("Pause")
-        pause_btn.clicked.connect(self.board.pause)
+        pause_btn.clicked.connect(self.GUIBoard.pause)
 
         # GroupBox for Buttons
 
@@ -88,8 +92,8 @@ class App(QWidget):
         tool_box = QGroupBox()
 
         vbox = QVBoxLayout()
-        vbox.addWidget(turn_label)
-        vbox.addWidget(is_game_over_label)
+        vbox.addWidget(self.turn_label)
+        vbox.addWidget(self.is_game_over_label)
         vbox.addStretch(1)
         vbox.addWidget(AI_box)
         vbox.addStretch(1)
@@ -99,12 +103,12 @@ class App(QWidget):
 
         # board
         hbox = QHBoxLayout()
-        hbox.addWidget(self.board, stretch=2)
+        hbox.addWidget(self.GUIBoard, stretch=2)
         hbox.addWidget(tool_box, stretch=1)
 
         self.setLayout(hbox)
 
-        self.board.player = Player.Random()
+        self.GUIBoard.player = Player.Random()
         self.show()
 
     def combobox_change(self, text):
@@ -112,22 +116,31 @@ class App(QWidget):
         select_AI.addItem("MonteCarlo")
         select_AI.addItem("MonteCarloSecond")"""
         if text == "Random":
-            self.board.player = Player.Random()
+            self.GUIBoard.player = Player.Random()
             self.parameter.setText("No Parameter")
         if text == "MonteCarlo":
-            self.board.player = Player.MonteCarlo()
+            self.GUIBoard.player = Player.MonteCarlo()
             self.parameter.setText("Repeat Number")
         if text == "MonteCarloSecond":
-            self.board.player = Player.MonteCarloSecond()
+            self.GUIBoard.player = Player.MonteCarloSecond()
             self.parameter.setText("Second per a turn")
 
     def line_edit_change(self, text):
         try:
             parameter = int(text)
-            self.board.player.parameter = parameter
+            self.GUIBoard.player.parameter = parameter
         except ValueError:
             self.line_edit.clear()
 
+    def renew_turn(self, turn):
+        self.turn_label.setText("Turn : %d" %turn)
+        print("%d" %turn)
+
+    def game_over(self, gameover):
+        if gameover:
+            self.is_game_over_label.setText("Game Over")
+        else:
+            self.is_game_over_label.clear()
 
 
 class GUIBoard(QFrame):
@@ -135,6 +148,12 @@ class GUIBoard(QFrame):
 
     # Class Constant
     BOARD_SIZE = 500
+
+    # signal
+
+    turn_change = pyqtSignal(int)
+    is_game_end = pyqtSignal(bool)
+
 
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める.Playerの選択も"""
@@ -151,13 +170,14 @@ class GUIBoard(QFrame):
         self.Board_drawn = self.Board
         self.drop_timer = QTimer(self)
         self.drop_timer.setInterval(200)
+        self.is_game_end.emit(False)
         self.drop_timer.timeout.connect(self.draw_dropped)
 
     def step(self):
         """step one turn"""
         if not self.ispaused:  # ポーズ中でなければすすめる
             if not self.Board.is_game_end():
-                self.timer.stop()
+                #self.timer.stop()
                 next_c = self.player.next_cell(self.Board)
 
                 # draw before_drop
@@ -165,29 +185,33 @@ class GUIBoard(QFrame):
                 self.drop_timer.start()
 
                 # draw after_drop
-                self.timer.start()
+                #self.timer.start()
                 self.update()
 
             else:
                 print(self.Board.turn_number)
-                self.timer.stop()
+                #self.timer.stop()
                 self.ispaused = True
+                self.is_game_end.emit(True)
 
     def draw_dropped(self):
         """Boardをおとした後の盤面を表示する"""
         self.drop_timer.stop()
         self.Board_drawn = self.Board
         self.update()
+        self.turn_change.emit(self.Board.turn_number)
+        QTimer.singleShot(100, self.step)
+
 
     def start(self):
         """AIをスタートする"""
         self.ispaused = False
-        self.timer = QTimer(self)
-        self.timer.setInterval(300)
+        #self.timer = QTimer(self)
+        #self.timer.setInterval(300)
+        QTimer.singleShot(100, self.step)
+        #self.timer.timeout.connect(self.step)
 
-        self.timer.timeout.connect(self.step)
-
-        self.timer.start()
+        #self.timer.start()
 
     def pause(self):
         """AIをストップする"""
