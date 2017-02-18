@@ -8,21 +8,7 @@ from numba.decorators import jit
 
 # In[2]:
 
-TABLE_SIZE = 4
-ALL_CELLS = []
-for x in range(TABLE_SIZE):
-    for y in range(TABLE_SIZE):
-        ALL_CELLS.append((x, y))
-ADJECENT = {}
-table_init = np.zeros((TABLE_SIZE, TABLE_SIZE))
-for i in range(TABLE_SIZE):
-    for j in range(TABLE_SIZE):
-        ADJECENT[(i, j)] = []
-        current_cell = np.array([i, j])
-        for a in np.array([[0, 1], [1, 0], [-1, 0], [0, -1]]):
-            adj = current_cell + a
-            if 0 <= adj[0] < TABLE_SIZE and 0 <= adj[1] < TABLE_SIZE:
-                ADJECENT[(i, j)].append(tuple(adj))
+
 
 
 def random_next(max_board):
@@ -51,10 +37,22 @@ def random_next(max_board):
 class Board(object):
     """盤面のクラス"""
 
+    # Class Variables
+    TABLE_SIZE = 4
+    ALL_CELLS = [(i, j) for i in range(4) for j in range(4)]
+    ADJECENT = {}
+    for i in range(TABLE_SIZE):
+        for j in range(TABLE_SIZE):
+            ADJECENT[(i, j)] = []
+            current_cell = np.array([i, j])
+            for a in np.array([[0, 1], [1, 0], [-1, 0], [0, -1]]):
+                adj = current_cell + a
+                if 0 <= adj[0] < TABLE_SIZE and 0 <= adj[1] < TABLE_SIZE:
+                    ADJECENT[(i, j)].append(tuple(adj))
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める"""
 
-        self.board = np.random.randint(1, 4, size=(TABLE_SIZE, TABLE_SIZE), dtype=np.int8)
+        self.board = np.random.randint(1, 4, size=(Board.TABLE_SIZE, Board.TABLE_SIZE), dtype=np.int8)
         self.selectable = None
         self.turn_number = 0
 
@@ -104,13 +102,13 @@ class Board(object):
     def print_board(self):
         """ボードを表示する。座標番号つき"""
         s = " "
-        for i in range(TABLE_SIZE):
+        for i in range(Board.TABLE_SIZE):
             s = s + " " + str(i)
         print(s)
 
-        for i in range(TABLE_SIZE):
+        for i in range(Board.TABLE_SIZE):
             s = str(i)
-            for j in range(TABLE_SIZE):
+            for j in range(Board.TABLE_SIZE):
                 s = s + " " + str(self.board[i, j])
             print(s)
 
@@ -120,9 +118,9 @@ class Board(object):
     def __selectable_list(self):
         """選べる場所の集合.おける座標をタプルのセットで返す"""
         l = []
-        for cell in ALL_CELLS:
+        for cell in Board.ALL_CELLS:
             if cell not in l:
-                for adj in ADJECENT[cell]:
+                for adj in Board.ADJECENT[cell]:
                     if self.board[adj] == self.board[cell]:
                         l.append(cell)
                         l.append(adj)
@@ -146,7 +144,7 @@ class Board(object):
 
         """選択したCellと同じ数字でつながっているCellの座標を返す。途中で使う用。"""
         # cell is given as tuple
-        for x in ADJECENT[cell]:
+        for x in Board.ADJECENT[cell]:
             if x not in self.con_list:
                 if self.board[cell] == self.board[x]:
                     self.con_list.append(x)
@@ -167,14 +165,14 @@ class Board(object):
 
         """0に変えた後0を消して上にある数字を下に落下させる"""
         self.board = list(self.board)
-        for i in range(TABLE_SIZE):
+        for i in range(Board.TABLE_SIZE):
             # move column i
             new_column = []
-            for j in range(TABLE_SIZE):
+            for j in range(Board.TABLE_SIZE):
                 if self.board[j][i] != 0:  # i列の０を除いたリスト上→下と右→左が対応
                     new_column.append(self.board[j][i])
 
-            for k in range(-1, -TABLE_SIZE - 1, -1):
+            for k in range(-1, -Board.TABLE_SIZE - 1, -1):
                 try:
                     self.board[k][i] = new_column[k]
                 except IndexError:
@@ -197,7 +195,7 @@ class Board(object):
             try:
                 a = input("type x-axis")
                 x = int(a)
-                if 0 <= x < TABLE_SIZE:
+                if 0 <= x < Board.TABLE_SIZE:
                     break
                 else:
                     print("type correct x-axis")
@@ -207,7 +205,7 @@ class Board(object):
             try:
                 a = input("type y-axis")
                 y = int(a)
-                if 0 <= y < TABLE_SIZE:
+                if 0 <= y < Board.TABLE_SIZE:
                     break
                 else:
                     print("type correct y-axis")
@@ -215,6 +213,19 @@ class Board(object):
                 print("type an integer")
         return x, y
 
+    def change_table_size(self, table_size):
+        Board.TABLE_SIZE = table_size
+        Board.ALL_CELLS = [(i, j) for i in range(table_size) for j in range(table_size)]
+        Board.ADJECENT = {}
+
+        for i in range(table_size):
+            for j in range(table_size):
+                Board.ADJECENT[(i, j)] = []
+                current_cell = np.array([i, j])
+                for a in np.array([[0, 1], [1, 0], [-1, 0], [0, -1]]):
+                    adj = current_cell + a
+                    if 0 <= adj[0] < table_size and 0 <= adj[1] < table_size:
+                        Board.ADJECENT[(i, j)].append(tuple(adj))
 
 def test(n):
     for i in range(n):

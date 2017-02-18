@@ -147,8 +147,7 @@ class App(QWidget):
             self.is_game_over_label.clear()
 
     def table_size_change(self, text):
-        table_size = int(text)
-        Board.TABLE_SIZE = table_size
+        self.GUIBoard.Board.change_table_size(int(text))
         self.GUIBoard.init_board()
         self.GUIBoard.update()
 
@@ -233,8 +232,8 @@ class GUIBoard(QFrame):
         """select cell which is clicked by mouse"""
         cell = 0
         cell_size = self._get_cell_size()
-        for i in range(Board.TABLE_SIZE):
-            for j in range(Board.TABLE_SIZE):
+        for i in range(Board.Board.TABLE_SIZE):
+            for j in range(Board.Board.TABLE_SIZE):
                 if j * cell_size <= x < (j + 1) * cell_size:
                     if i * cell_size <= y < (i + 1) * cell_size:
                         cell = (i, j)
@@ -253,7 +252,7 @@ class GUIBoard(QFrame):
     @staticmethod
     def _get_cell_size():
         """それぞれのマスの大きさをピクセル数で返す"""
-        return 500 // Board.TABLE_SIZE
+        return 500 // Board.Board.TABLE_SIZE
 
     def paintEvent(self, event):
         print("QpainterCalled")
@@ -279,8 +278,8 @@ class GUIBoard(QFrame):
 
     def _draw_board(self, board):
         painter = QPainter(self)
-        for i in range(Board.TABLE_SIZE):
-            for j in range(Board.TABLE_SIZE):
+        for i in range(Board.Board.TABLE_SIZE):
+            for j in range(Board.Board.TABLE_SIZE):
                 self._draw_a_cell(painter, i, j, board.board[i][j])
 
 
