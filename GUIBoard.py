@@ -14,8 +14,6 @@ import Player
 
 
 class App(QWidget):
-
-
     def __init__(self):
         super().__init__()
         self.GUIBoard = GUIBoard()
@@ -49,20 +47,26 @@ class App(QWidget):
         # line edotor for paramater of ai
         self.line_edit = QLineEdit()
         self.line_edit.textChanged.connect(self.line_edit_change)
+        # combobox to change table size
 
+        self.select_size = QComboBox()
+        self.select_size.addItem("4")
+        self.select_size.addItem("5")
+        self.select_size.addItem("6")
+        self.select_size.currentTextChanged.connect(self.table_size_change)
+
+        # label for select_size
+        self.select_size_label = QLabel("select table size")
         # GroupBox for AI
-
 
         AI_box = QGroupBox()
         AI_layout = QGridLayout()
 
-
-
-
         AI_layout.addWidget(select_AI, 0, 0, 1, 2)
         AI_layout.addWidget(self.parameter, 1, 0)
         AI_layout.addWidget(self.line_edit, 1, 1)
-
+        AI_layout.addWidget(self.select_size_label, 2, 0)
+        AI_layout.addWidget(self.select_size, 2, 1)
         AI_box.setLayout(AI_layout)
 
         # buttons
@@ -133,14 +137,20 @@ class App(QWidget):
             self.line_edit.clear()
 
     def renew_turn(self, turn):
-        self.turn_label.setText("Turn : %d" %turn)
-        print("%d" %turn)
+        self.turn_label.setText("Turn : %d" % turn)
+        print("%d" % turn)
 
     def game_over(self, gameover):
         if gameover:
             self.is_game_over_label.setText("Game Over")
         else:
             self.is_game_over_label.clear()
+
+    def table_size_change(self, text):
+        table_size = int(text)
+        Board.TABLE_SIZE = table_size
+        self.GUIBoard.init_board()
+        self.GUIBoard.update()
 
 
 class GUIBoard(QFrame):
@@ -154,7 +164,6 @@ class GUIBoard(QFrame):
     turn_change = pyqtSignal(int)
     is_game_end = pyqtSignal(bool)
 
-
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める.Playerの選択も"""
         super().__init__()
@@ -164,7 +173,7 @@ class GUIBoard(QFrame):
 
     def init_board(self):
         self.Board = Board.Board()
-        #self.player = Player.MonteCarloSecond(second=1)
+        # self.player = Player.MonteCarloSecond(second=1)
         self.ispaused = True
         self.resize(500, 500)
         self.Board_drawn = self.Board
@@ -177,7 +186,7 @@ class GUIBoard(QFrame):
         """step one turn"""
         if not self.ispaused:  # ポーズ中でなければすすめる
             if not self.Board.is_game_end():
-                #self.timer.stop()
+                # self.timer.stop()
                 next_c = self.player.next_cell(self.Board)
 
                 # draw before_drop
@@ -185,12 +194,12 @@ class GUIBoard(QFrame):
                 self.drop_timer.start()
 
                 # draw after_drop
-                #self.timer.start()
+                # self.timer.start()
                 self.update()
 
             else:
                 print(self.Board.turn_number)
-                #self.timer.stop()
+                # self.timer.stop()
                 self.ispaused = True
                 self.is_game_end.emit(True)
 
@@ -202,21 +211,19 @@ class GUIBoard(QFrame):
         self.turn_change.emit(self.Board.turn_number)
         QTimer.singleShot(100, self.step)
 
-
     def start(self):
         """AIをスタートする"""
         self.ispaused = False
-        #self.timer = QTimer(self)
-        #self.timer.setInterval(300)
+        # self.timer = QTimer(self)
+        # self.timer.setInterval(300)
         QTimer.singleShot(100, self.step)
-        #self.timer.timeout.connect(self.step)
+        # self.timer.timeout.connect(self.step)
 
-        #self.timer.start()
+        # self.timer.start()
 
     def pause(self):
         """AIをストップする"""
         self.ispaused = True
-        self.timer.stop()
 
     def mousePressEvent(self, event):
         """when mouse clicked"""
@@ -243,7 +250,8 @@ class GUIBoard(QFrame):
         """GUIBoardのUIの初期化"""
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
 
-    def _get_cell_size(self):
+    @staticmethod
+    def _get_cell_size():
         """それぞれのマスの大きさをピクセル数で返す"""
         return 500 // Board.TABLE_SIZE
 
