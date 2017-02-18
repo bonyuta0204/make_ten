@@ -261,14 +261,14 @@ class GUIBoard(QFrame):
 
     def _draw_a_cell(self, painter, i, j, value):
         """Draw cell(i, j), value is the number of the cell"""
-        colorTable = ["white", 0xCC6666, 0x66CC66, 0x6666CC,
-                      0xCCCC66, 0xCC66CC, 0x66CCCC, 0xDAAA00, "black", "green", "yellow", "orange"]
+        colorTable = ["white", "#01bfa6", "#0b9cdb", "#ff5d1a",
+                      "#ffa81b", "#f22c43", "#7b50ff", "#e33b92", "black", "green", "yellow", "orange"]
 
         color = QColor(colorTable[value])
-        painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size() - 1,
-                         self._get_cell_size() - 1, color)
+        painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size(),
+                         self._get_cell_size(), color)
 
-        font = QFont("Times", 40)
+        font = QFont("Times", 0.25 * self._get_cell_size())
         painter.setFont(font)
         pen_color = QColor("white")
         painter.setPen(pen_color)

@@ -211,6 +211,9 @@ def main():
 
     plt.show()
 
-
+def test():
+    player1 = MonteCarlo(repeat=10)
+    new_game = Game.Game(player1)
+    new_game.play(show=True)
 if __name__ == "__main__":
-    main()
+    test()
