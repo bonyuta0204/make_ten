@@ -28,7 +28,7 @@ class App(QWidget):
         self.turn_label = QLabel("Turn")
         # signal
         self.GUIBoard.turn_change.connect(self.renew_turn)
-        self.GUIBoard.is_game_end.connect(self.game_over)
+        self.GUIBoard.is_game_over.connect(self.game_over)
         # label for game over
 
         self.is_game_over_label = QLabel("")
@@ -42,7 +42,7 @@ class App(QWidget):
         select_AI.currentTextChanged.connect(self.combobox_change)
         # label for parameter
 
-        self.parameter = QLabel("second")
+        self.parameter = QLabel("No Parameter")
 
         # line edotor for paramater of ai
         self.line_edit = QLineEdit()
@@ -122,19 +122,34 @@ class App(QWidget):
         if text == "Random":
             self.GUIBoard.player = Player.Random()
             self.parameter.setText("No Parameter")
+            self.line_edit.setText("")
         if text == "MonteCarlo":
             self.GUIBoard.player = Player.MonteCarlo()
             self.parameter.setText("Repeat Number")
+            self.line_edit.setText("5")
         if text == "MonteCarloSecond":
             self.GUIBoard.player = Player.MonteCarloSecond()
             self.parameter.setText("Second per a turn")
-
+            self.line_edit.setText("0.5")
     def line_edit_change(self, text):
-        try:
-            parameter = int(text)
-            self.GUIBoard.player.parameter = parameter
-        except ValueError:
+        if not self.GUIBoard.is_paused:
+            self.GUIBoard.is_paused = True
+        if self.GUIBoard.player.name == "MonteCarlo":
+            try:
+                parameter = int(text)
+                self.GUIBoard.player.parameter = parameter
+            except ValueError:
+                self.line_edit.clear()
+        elif self.GUIBoard.player.name == "MonteCarloSecond":
+            try:
+                parameter = float(text)
+                self.GUIBoard.player.parameter = parameter
+            except ValueError:
+                self.line_edit.clear()
+        else:
             self.line_edit.clear()
+
+
 
     def renew_turn(self, turn):
         self.turn_label.setText("Turn : %d" % turn)
@@ -153,15 +168,17 @@ class App(QWidget):
 
 
 class GUIBoard(QFrame):
-    """盤面のクラス"""
+    """
 
+
+    """
     # Class Constant
     BOARD_SIZE = 500
 
     # signal
 
     turn_change = pyqtSignal(int)
-    is_game_end = pyqtSignal(bool)
+    is_game_over = pyqtSignal(bool)
 
     def __init__(self):
         """盤面の初期化。完全ランダムで埋める.Playerの選択も"""
@@ -172,18 +189,17 @@ class GUIBoard(QFrame):
 
     def init_board(self):
         self.Board = Board.Board()
-        # self.player = Player.MonteCarloSecond(second=1)
-        self.ispaused = True
-        self.resize(500, 500)
+        self.is_paused = True
+        self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
         self.Board_drawn = self.Board
         self.drop_timer = QTimer(self)
         self.drop_timer.setInterval(200)
-        self.is_game_end.emit(False)
+        self.is_game_over.emit(False)
         self.drop_timer.timeout.connect(self.draw_dropped)
 
     def step(self):
         """step one turn"""
-        if not self.ispaused:  # ポーズ中でなければすすめる
+        if not self.is_paused:  # ポーズ中でなければすすめる
             if not self.Board.is_game_end():
                 # self.timer.stop()
                 next_c = self.player.next_cell(self.Board)
@@ -197,10 +213,9 @@ class GUIBoard(QFrame):
                 self.update()
 
             else:
-                print(self.Board.turn_number)
-                # self.timer.stop()
-                self.ispaused = True
-                self.is_game_end.emit(True)
+
+                self.is_paused = True
+                self.is_game_over.emit(True)
 
     def draw_dropped(self):
         """Boardをおとした後の盤面を表示する"""
@@ -212,17 +227,14 @@ class GUIBoard(QFrame):
 
     def start(self):
         """AIをスタートする"""
-        self.ispaused = False
-        # self.timer = QTimer(self)
-        # self.timer.setInterval(300)
+        if self.Board.is_game_end():
+            self.init_board()
+        self.is_paused = False
         QTimer.singleShot(100, self.step)
-        # self.timer.timeout.connect(self.step)
-
-        # self.timer.start()
 
     def pause(self):
         """AIをストップする"""
-        self.ispaused = True
+        self.is_paused = True
 
     def mousePressEvent(self, event):
         """when mouse clicked"""
@@ -230,20 +242,23 @@ class GUIBoard(QFrame):
 
     def mouse_step(self, x, y):
         """select cell which is clicked by mouse"""
-        cell = 0
-        cell_size = self._get_cell_size()
-        for i in range(Board.Board.TABLE_SIZE):
-            for j in range(Board.Board.TABLE_SIZE):
-                if j * cell_size <= x < (j + 1) * cell_size:
-                    if i * cell_size <= y < (i + 1) * cell_size:
-                        cell = (i, j)
-        if cell in self.Board.selectable_list():
-            if not self.Board.is_game_end():
+        # get number of clicked cell
+        if not self.Board.is_game_end():
+            cell_size = self._get_cell_size()
+            for i in range(Board.Board.TABLE_SIZE):
+                for j in range(Board.Board.TABLE_SIZE):
+                    if j * cell_size <= x < (j + 1) * cell_size:
+                        if i * cell_size <= y < (i + 1) * cell_size:
+                            cell = (i, j)
+            # if cell is selectable
+            if cell in self.Board.selectable_list():
                 next_c = cell
-
                 self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
-                self.drop_timer.start()
-                self.update()
+                if not self.Board.is_game_end():
+                    self.drop_timer.start()
+                    self.update()
+                else:
+                    self.is_game_over.emit(True)
 
     def init_ui(self):
         """GUIBoardのUIの初期化"""
@@ -252,10 +267,9 @@ class GUIBoard(QFrame):
     @staticmethod
     def _get_cell_size():
         """それぞれのマスの大きさをピクセル数で返す"""
-        return 500 // Board.Board.TABLE_SIZE
+        return GUIBoard.BOARD_SIZE // Board.Board.TABLE_SIZE
 
     def paintEvent(self, event):
-        print("QpainterCalled")
 
         self._draw_board(self.Board_drawn)
 
@@ -268,7 +282,7 @@ class GUIBoard(QFrame):
         painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size(),
                          self._get_cell_size(), color)
 
-        font = QFont("Times", 0.25 * self._get_cell_size())
+        font = QFont("Times", 0.20 * self._get_cell_size())
         painter.setFont(font)
         pen_color = QColor("white")
         painter.setPen(pen_color)

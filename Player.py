@@ -25,7 +25,7 @@ class Random(object):
     """Randomに選ぶAIのクラス"""
 
     def __init__(self):
-        pass
+        self.name = "Random"
 
     def next_cell(self, board):
         """boardを受け取り、次に選択するcellの座標をタプルで返す"""
@@ -71,6 +71,7 @@ class MonteCarlo(object):
         self.parameter = repeat
         self.eval_list = []
         self.game_num = 0
+        self.name = "MonteCarlo"
 
     def next_cell(self, board):
         """モンテカルロ法の評価値が一番高かった手を返す。"""
@@ -128,7 +129,7 @@ class MonteCarloSecond(object):
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
-
+        self.name = "MonteCarloSecond"
     def next_cell(self, board):
         """モンテカルロ法の評価値が一番高かった手を返す
 
