@@ -19,7 +19,10 @@ class Game(object):
         showがTrueの時はそれぞれの盤面とその時に何を選んだかを表示する。
         resultがTrueの時は終了後のみ盤面と最高の数字を表示する。
         また、boardを指定した場合、始めの局面がboardから始まる"""
-        game_board = CBoard.Board()
+        if not board:
+
+            game_board = CBoard.Board()
+            game_board.init_board()
         if board:
             game_board = board.clone()  # boardを指定した場合には始めの盤面がboardから始める。
         n = 0

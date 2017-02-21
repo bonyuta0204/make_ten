@@ -81,12 +81,14 @@ cdef class Board:
         self.selectable = []
         self.turn_number = 0
         self.ADJACENT = make_adjacent(self.TABLE_SIZE)
-        self.init_board()
+
 
     def init_board(self):
         """randomly init board"""
         for i in range(self.TABLE_SIZE ** 2):
             self.board[i] = random.randint(1, 3)
+        self.selectable = []
+        self.turn_number = 0
 
     def print_board(self):
 
@@ -157,8 +159,9 @@ cdef class Board:
         else:
             return False
 
-    def play_game(self):
+    def play(self):
         """適当にプレイする"""
+        self.init_board()
         while True:
             if self.is_game_end() == False:
                 self.select_cell(self.selectable_list()[0])
