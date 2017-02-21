@@ -140,6 +140,12 @@ class Board(object):
 
         return np.amax(self.board)
 
+    def set_board(self, given_board):
+
+        """与えられたboardをセットする"""
+        self.board = np.copy(given_board)
+
+
     def __connected(self, cell):
 
         """選択したCellと同じ数字でつながっているCellの座標を返す。途中で使う用。"""

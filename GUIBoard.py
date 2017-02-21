@@ -131,6 +131,7 @@ class App(QWidget):
             self.GUIBoard.player = Player.MonteCarloSecond()
             self.parameter.setText("Second per a turn")
             self.line_edit.setText("0.5")
+
     def line_edit_change(self, text):
         if not self.GUIBoard.is_paused:
             self.GUIBoard.is_paused = True
@@ -149,11 +150,8 @@ class App(QWidget):
         else:
             self.line_edit.clear()
 
-
-
     def renew_turn(self, turn):
         self.turn_label.setText("Turn : %d" % turn)
-        print("%d" % turn)
 
     def game_over(self, gameover):
         if gameover:
@@ -258,6 +256,8 @@ class GUIBoard(QFrame):
                     self.drop_timer.start()
                     self.update()
                 else:
+                    self.drop_timer.start()
+                    self.update()
                     self.is_game_over.emit(True)
 
     def init_ui(self):

@@ -141,12 +141,12 @@ class MonteCarloSecond(object):
         self.second_each_ = self.parameter / float(self.num_selectable_)
 
         # board_evalを使って実験をする
-        ma = (-1, -1)
+        max_score = 0
         best_cell = (10, 10)
         for a in board.selectable_list():  # それぞれの選択肢において
             self.repeat = 0
-            eva = self.monte_eval(a, board_eval)  # その選択肢の評価値
-
+            eva = self.monte_eval(a, board_eval)  # その選択肢の評価値 eva(turn_number, max_num)
+            """
             if eva[1] > ma[1]:  # 最大の数字が過去最高の時
                 ma = eva
                 best_cell = a
@@ -155,11 +155,14 @@ class MonteCarloSecond(object):
                 if eva[0] > ma[0]:
                     ma = eva
                     best_cell = a
+                """
+            score = 0.2 * eva[0] + eva[1]
+            if score > max_score:
+                max_score = score
+                best_cell = a
 
-            else:
-                pass
 
-        self.eval_list.append(ma)
+        self.eval_list.append(score)
         self.num_try.append(float(self.repeat / self.num_selectable_))
         return best_cell
 
