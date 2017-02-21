@@ -76,8 +76,8 @@ class MonteCarlo(object):
     def next_cell(self, board):
         """モンテカルロ法の評価値が一番高かった手を返す。"""
         # 評価用に新しいBoardをつくる
-        board_eval = Board.Board()
-        board_eval.board = np.copy(board.board)
+
+        board_eval = board.clone()
         # board_evalを使って実験をする
         ma = (-1, -1)
         best_cell = (10, 10)
@@ -105,8 +105,8 @@ class MonteCarlo(object):
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
         for i in range(self.parameter):  # 毎回インスタンスを生成しないといけない？タプルにすれば大丈夫？
-            new_board = Board.Board()
-            new_board.board = np.copy(current_board.board)
+
+            new_board = current_board.clone()
             new_board.select_cell(cell)
             result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
             result_max.append(result[2])
@@ -135,8 +135,8 @@ class MonteCarloSecond(object):
 
         。"""
         # 評価用に新しいBoardをつくる
-        board_eval = Board.Board()
-        board_eval.board = np.copy(board.board)
+
+        board_eval = board.clone()
         self.num_selectable_ = len(board.selectable_list())
         self.second_each_ = self.parameter / float(self.num_selectable_)
 
@@ -172,8 +172,8 @@ class MonteCarloSecond(object):
         result_turn = []  # ターン数のリスト
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
-            new_board = Board.Board()
-            new_board.board = np.copy(current_board.board)
+
+            new_board = current_board.clone()
             new_board.select_cell(cell)
             result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
             result_max.append(result[2])

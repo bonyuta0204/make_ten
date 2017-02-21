@@ -1,7 +1,7 @@
 # coding: utf-8
 
 
-import copy
+import CBoard
 import Board
 import Player
 
@@ -19,15 +19,15 @@ class Game(object):
         showがTrueの時はそれぞれの盤面とその時に何を選んだかを表示する。
         resultがTrueの時は終了後のみ盤面と最高の数字を表示する。
         また、boardを指定した場合、始めの局面がboardから始まる"""
-        game_board = Board.Board()
+        game_board = CBoard.Board()
         if board:
-            game_board.board = copy.deepcopy(board.board)  # boardを指定した場合には始めの盤面がboardから始める。
+            game_board = board.clone()  # boardを指定した場合には始めの盤面がboardから始める。
         n = 0
         while n < 100000:
             if not game_board.is_game_end():
                 # ゲームが続く場合
                 if show:
-                    print("Turn", game_board.turn_number)
+                    print("Turn", game_board.get_turn_num())
                     game_board.print_board()
                 else:
                     pass
@@ -35,7 +35,7 @@ class Game(object):
                 next_c = self.player.next_cell(game_board)
                 if next_c is False:
                     print(u"中断されました")
-                    return game_board.board, game_board.turn_number, game_board.max_board()
+                    return game_board.get_board(), game_board.get_turn_num(), game_board.max_board()
 
                 else:
                     pass
@@ -48,13 +48,13 @@ class Game(object):
             else:
                 if result:
                     print("play over!")
-                    print("Turn" + str(game_board.turn_number))
+                    print("Turn" + str(game_board.get_turn_num()))
                     game_board.print_board()
                     print("Max number was" + str(game_board.max_board()))  # boardにMaximumを足す)
 
                 else:
                     pass
-                return game_board.board, game_board.turn_number, game_board.max_board()
+                return game_board.get_board(), game_board.get_turn_num(), game_board.max_board()
 
 
 def play():
