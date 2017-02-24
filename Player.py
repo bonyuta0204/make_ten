@@ -116,7 +116,7 @@ class MonteCarlo(object):
 
 
 class MonteCarloSecond(object):
-    def __init__(self, second=1.0):
+    def __init__(self, second=1.0, turn_weight=0.4):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             self.eval_list : list
                 プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
@@ -124,12 +124,16 @@ class MonteCarloSecond(object):
                 合計で何ゲームプレイしたか
             self.num_try: list
                 それぞれの局面で平均何回プレーして期待値をもとめたかのリスト
+            self.turn_weight : float
+                turn数にかける重み
         """
         self.parameter = second
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
+        self.turn_weight = turn_weight
         self.name = "MonteCarloSecond"
+
     def next_cell(self, board):
         """モンテカルロ法の評価値が一番高かった手を返す
 
@@ -156,11 +160,10 @@ class MonteCarloSecond(object):
                     ma = eva
                     best_cell = a
                 """
-            score = 0.2 * eva[0] + eva[1]
+            score = self.turn_weight * eva[0] + eva[1]
             if score > max_score:
                 max_score = score
                 best_cell = a
-
 
         self.eval_list.append(score)
         self.num_try.append(float(self.repeat / self.num_selectable_))
@@ -172,7 +175,6 @@ class MonteCarloSecond(object):
         result_turn = []  # ターン数のリスト
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
-
             new_board = current_board.clone()
             new_board.select_cell(cell)
             result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
@@ -184,40 +186,55 @@ class MonteCarloSecond(object):
         return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
 
 
-def main():
+def main(n):
+    max_history = []
+    turn_num_history = []
+    parameters = np.linspace(0.01, 0.8, n)
+    print(parameters)
+    for i in range(n):
+        max_history_row = []
+        turn_num_row = []
+        for j in range(5):
+            print("parameter i: %d\n try number: %d" % (i, j))
+            # i番目のParameterでPlayした結果を格納. result= [board, turn_num, max_board]
+            new_game = Game.Game(MonteCarloSecond(second=0.1, turn_weight=parameters[i]))
+            result = new_game.play()
+            max_history_row.append(result[2])
+            turn_num_row.append(result[1])
+        max_history.append(max_history_row)
+        turn_num_history.append(turn_num_row)
 
-    player1 = MonteCarloSecond(second=1)
-    new_game = Game.Game(player1)
-    new_game.play(show=True)
-    result = np.array(player1.eval_list)
-    print("MonteCarloSecond(%f)" % player1.parameter, player1.game_num)
+    print(parameters)
+    print(max_history)
+    print(turn_num_history)
+
+    max_means = np.mean(max_history, axis=1)
+    turn_num_means = np.mean(turn_num_history, axis=1)
+    max_std = np.std(max_history, axis=1)
+    turn_num_std = np.std(turn_num_history, axis=1)
+
     plt.subplot(211)
-    plt.plot(result[:, 0], label="MonteCarloSecond(%f)" % player1.parameter)
-
+    plt.plot(parameters, max_means)
+    plt.fill_between(parameters, max_means + max_std, max_means - max_std, alpha=0.1)
+    plt.xlabel("parameter")
+    plt.ylabel("max_num")
+    plt.grid()
     plt.subplot(212)
-    plt.plot(result[:, 1], label="MonteCarloSecond(%f)" % player1.parameter)
-
-    player = MonteCarlo(repeat=10)
-    new_game = Game.Game(player)
-    new_game.play(show=True)
-    result = np.array(player.eval_list)
-    print("MonteCarlo(%d)" % player.parameter, player.game_num)
-    plt.subplot(211)
-    plt.plot(result[:, 0], label="MonteCarlo(%d)" % player.parameter)
-    plt.ylabel("number of remaining turn")
-    plt.grid(True)
-    plt.legend(loc="best")
-    plt.subplot(212)
-    plt.plot(result[:, 1], label="MonteCarlo(%d)" % player.parameter)
-    plt.ylabel("max number")
-    plt.grid(True)
-    plt.legend(loc="best")
-
+    plt.plot(parameters, turn_num_means)
+    plt.fill_between(parameters, turn_num_means + turn_num_std, turn_num_means - turn_num_std, alpha=0.1)
+    plt.xlabel("parameter")
+    plt.ylabel("turn_num")
+    plt.grid()
     plt.show()
 
+
 def test():
-    player1 = MonteCarlo(repeat=10)
+    player1 = MonteCarloSecond(second=0.5)
     new_game = Game.Game(player1)
-    new_game.play(show=True)
+    new_game.play(show=False)
+    plt.plot(player1.num_try)
+    plt.ylabel("number of try")
+    plt.grid()
+    plt.show()
 if __name__ == "__main__":
     test()

@@ -4,6 +4,7 @@
 
 import sys
 import Board
+import CBoard
 
 from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow,
                              QPushButton, QHBoxLayout, QVBoxLayout, QLabel,
@@ -160,8 +161,11 @@ class App(QWidget):
             self.is_game_over_label.clear()
 
     def table_size_change(self, text):
-        self.GUIBoard.Board.change_table_size(int(text))
         self.GUIBoard.init_board()
+        self.GUIBoard.Board = CBoard.Board(table_size=int(text))
+        self.GUIBoard.Board.init_board()
+        self.GUIBoard.Board_drawn = self.GUIBoard.Board
+
         self.GUIBoard.update()
 
 
@@ -186,7 +190,8 @@ class GUIBoard(QFrame):
         self.init_board()
 
     def init_board(self):
-        self.Board = Board.Board()
+        self.Board = CBoard.Board()
+        self.Board.init_board()
         self.is_paused = True
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
         self.Board_drawn = self.Board
@@ -220,7 +225,7 @@ class GUIBoard(QFrame):
         self.drop_timer.stop()
         self.Board_drawn = self.Board
         self.update()
-        self.turn_change.emit(self.Board.turn_number)
+        self.turn_change.emit(self.Board.get_turn_num())
         QTimer.singleShot(100, self.step)
 
     def start(self):
@@ -243,15 +248,17 @@ class GUIBoard(QFrame):
         # get number of clicked cell
         if not self.Board.is_game_end():
             cell_size = self._get_cell_size()
-            for i in range(Board.Board.TABLE_SIZE):
-                for j in range(Board.Board.TABLE_SIZE):
+            table_size = self.Board.get_table_size()
+            for i in range(table_size):
+                for j in range(table_size):
                     if j * cell_size <= x < (j + 1) * cell_size:
                         if i * cell_size <= y < (i + 1) * cell_size:
-                            cell = (i, j)
+                            cell = i * self.Board.get_table_size() + j
             # if cell is selectable
             if cell in self.Board.selectable_list():
                 next_c = cell
                 self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
+
                 if not self.Board.is_game_end():
                     self.drop_timer.start()
                     self.update()
@@ -264,10 +271,10 @@ class GUIBoard(QFrame):
         """GUIBoardのUIの初期化"""
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
 
-    @staticmethod
-    def _get_cell_size():
+
+    def _get_cell_size(self):
         """それぞれのマスの大きさをピクセル数で返す"""
-        return GUIBoard.BOARD_SIZE // Board.Board.TABLE_SIZE
+        return GUIBoard.BOARD_SIZE // self.Board.get_table_size()
 
     def paintEvent(self, event):
 
@@ -292,9 +299,13 @@ class GUIBoard(QFrame):
 
     def _draw_board(self, board):
         painter = QPainter(self)
-        for i in range(Board.Board.TABLE_SIZE):
-            for j in range(Board.Board.TABLE_SIZE):
-                self._draw_a_cell(painter, i, j, board.board[i][j])
+        board_drawn = board.get_board()
+
+
+        for i in range(self.Board.get_table_size()):
+            for j in range(self.Board.get_table_size()):
+
+                self._draw_a_cell(painter, i, j, board_drawn[i * self.Board.get_table_size() + j])
 
 
 if __name__ == "__main__":
