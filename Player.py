@@ -229,6 +229,11 @@ def main(n):
 
 
 def test():
+    player1 = MonteCarlo(repeat=20)
+    new_game = Game.Game(player1)
+    new_game.play(show=False)
+
+def test_second():
     player1 = MonteCarloSecond(second=0.5)
     new_game = Game.Game(player1)
     new_game.play(show=False)
