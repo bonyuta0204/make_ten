@@ -116,7 +116,7 @@ class MonteCarlo(object):
 
 
 class MonteCarloSecond(object):
-    def __init__(self, second=1.0, turn_weight=0.4):
+    def __init__(self, second=0.5, turn_weight=0.01):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             self.eval_list : list
                 プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
@@ -164,8 +164,9 @@ class MonteCarloSecond(object):
             if score > max_score:
                 max_score = score
                 best_cell = a
+                expectation = eva
 
-        self.eval_list.append(score)
+        self.eval_list.append(expectation)
         self.num_try.append(float(self.repeat / self.num_selectable_))
         return best_cell
 
@@ -197,7 +198,7 @@ def main(n):
         for j in range(5):
             print("parameter i: %d\n try number: %d" % (i, j))
             # i番目のParameterでPlayした結果を格納. result= [board, turn_num, max_board]
-            new_game = Game.Game(MonteCarloSecond(second=0.1, turn_weight=parameters[i]))
+            new_game = Game.Game(MonteCarloSecond(second=0.5, turn_weight=parameters[i]))
             result = new_game.play()
             max_history_row.append(result[2])
             turn_num_row.append(result[1])
@@ -231,15 +232,36 @@ def main(n):
 def test():
     player1 = MonteCarlo(repeat=20)
     new_game = Game.Game(player1)
-    new_game.play(show=False)
+    new_game.play(show=True)
+
 
 def test_second():
     player1 = MonteCarloSecond(second=0.5)
     new_game = Game.Game(player1)
-    new_game.play(show=False)
+    new_game.play(show=True)
     plt.plot(player1.num_try)
     plt.ylabel("number of try")
     plt.grid()
     plt.show()
+
+def show_expectation():
+    player1 = MonteCarloSecond(second=1.0, turn_weight=0.01)
+    new_game = Game.Game(player1)
+    new_game.play(show=True)
+    expectation =   np.array(player1.eval_list) # expectation[:,0] : turn_num, expectation[:,1]:max_num
+    plt.subplot(211)
+    plt.plot(expectation[:, 0], label="Turn Number")
+    plt.ylabel("Turn Number")
+    plt.grid()
+    plt.legend()
+    plt.subplot(212)
+    plt.plot(expectation[:, 1], label="Max Number")
+    plt.ylabel("Max Number")
+    plt.grid()
+    plt.legend()
+    plt.show()
+
+
+
 if __name__ == "__main__":
-    test()
+    show_expectation()

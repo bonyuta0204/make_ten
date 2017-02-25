@@ -69,7 +69,7 @@ cdef class Board:
     cdef int board[100]
     cdef list selectable
     cdef int turn_number
-    cdef list connected_
+    cdef int connected[100]
 
 
     def __init__(self, table_size=4):
@@ -175,6 +175,7 @@ cdef class Board:
             if self.is_game_end() == False:
                 self.select_cell(self.selectable_list()[0])
                 self.print_board()
+                print("")
             else:
                 break
 
@@ -194,12 +195,19 @@ cdef class Board:
 
     cdef _erace_connected(self, cell):
         """ 選んだCellとつながっているCellを0にする。選んだCellは値を1増やす"""
-        self.connected_ = []
+        #self.connected_ = []
+        #intiialize self.conncected. 0 represents it it not connected, 1 represents it is connected
+        cdef int i
+        for i in range(self.TABLE_SIZE ** 2):
+            self.connected[i] = 0
+
         self._connected(cell)
         selected_cell = self.board[cell]
-        for connected_cell in self.connected_:
-            self.board[connected_cell] = 0
-
+        # for connected_cell in self.connected_:
+           # self.board[connected_cell] = 0
+        for i in range(self.TABLE_SIZE ** 2):
+            if self.connected[i] == 1:
+                self.board[i] =0
         self.board[cell] += selected_cell + 1
 
     cdef _drop(self):
@@ -236,9 +244,11 @@ cdef class Board:
         for j in range(4):
             adj =  self.ADJACENT[cell][j]
             if adj != WALL:
-                if adj not in self.connected_ :
+                #if adj not in self.connected_ :
+                if self.connected[adj] != 1:
                     if self.board[cell] == self.board[adj]:
-                        self.connected_.append(adj)
+                        #self.connected_.append(adj)
+                        self.connected[adj] = 1
                         self._connected(adj)
 
 

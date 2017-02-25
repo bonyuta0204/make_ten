@@ -21,7 +21,7 @@ class Game(object):
         また、boardを指定した場合、始めの局面がboardから始まる"""
         if not board:
 
-            game_board = CBoard.Board(table_size=5)
+            game_board = CBoard.Board(table_size=4)
             game_board.init_board()
         if board:
             game_board = board.clone()  # boardを指定した場合には始めの盤面がboardから始める。
