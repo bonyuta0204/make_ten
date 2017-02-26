@@ -10,8 +10,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CBoard.c" afterPath="$PROJECT_DIR$/CBoard.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CBoard.ipynb" afterPath="$PROJECT_DIR$/CBoard.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CBoard.pyx" afterPath="$PROJECT_DIR$/CBoard.pyx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GUIBoard.py" afterPath="$PROJECT_DIR$/GUIBoard.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Game.py" afterPath="$PROJECT_DIR$/Game.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Player.py" afterPath="$PROJECT_DIR$/Player.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Py-CBoard.py" afterPath="$PROJECT_DIR$/Py-CBoard.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,8 +31,8 @@
       <file leaf-file-name="Player.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Player.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="632">
-              <caret line="267" column="0" lean-forward="true" selection-start-line="267" selection-start-column="0" selection-end-line="267" selection-end-column="0" />
+            <state relative-caret-position="18">
+              <caret line="256" column="14" lean-forward="true" selection-start-line="256" selection-start-column="14" selection-end-line="256" selection-end-column="14" />
               <folding>
                 <element signature="e#18#31#0" expanded="true" />
               </folding>
@@ -41,8 +43,8 @@
       <file leaf-file-name="GUIBoard.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GUIBoard.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="25">
-              <caret line="269" column="22" lean-forward="false" selection-start-line="269" selection-start-column="22" selection-end-line="269" selection-end-column="22" />
+            <state relative-caret-position="537">
+              <caret line="314" column="26" lean-forward="false" selection-start-line="314" selection-start-column="26" selection-end-line="314" selection-end-column="26" />
               <folding>
                 <element signature="e#27#37#0" expanded="true" />
               </folding>
@@ -53,8 +55,8 @@
       <file leaf-file-name="Game.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Game.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="23" column="50" lean-forward="false" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
+            <state relative-caret-position="374">
+              <caret line="22" column="51" lean-forward="true" selection-start-line="22" selection-start-column="51" selection-end-line="22" selection-end-column="51" />
               <folding>
                 <element signature="e#18#31#0" expanded="true" />
               </folding>
@@ -65,7 +67,7 @@
       <file leaf-file-name="Board.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Board.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="538">
+            <state relative-caret-position="426">
               <caret line="86" column="30" lean-forward="false" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
               <folding>
                 <element signature="e#27#45#0" expanded="true" />
@@ -77,8 +79,8 @@
       <file leaf-file-name="CBoard.pyx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CBoard.pyx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="500">
+              <caret line="20" column="27" lean-forward="true" selection-start-line="20" selection-start-column="27" selection-end-line="20" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -95,7 +97,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>self.con_set</find>
       <find>set</find>
       <find>self.game_num</find>
       <find>update</find>
@@ -125,6 +126,7 @@
       <find>Board</find>
       <find>Board()</find>
       <find>print</find>
+      <find>random</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -138,17 +140,19 @@
         <option value="$PROJECT_DIR$/CBoard.py" />
         <option value="$PROJECT_DIR$/CBoard.pyx.py" />
         <option value="$PROJECT_DIR$/Board.py" />
+        <option value="$PROJECT_DIR$/Py-CBoard.py" />
         <option value="$PROJECT_DIR$/GUIBoard.py" />
         <option value="$PROJECT_DIR$/CBoard.pyx" />
-        <option value="$PROJECT_DIR$/Player.py" />
         <option value="$PROJECT_DIR$/Game.py" />
+        <option value="$PROJECT_DIR$/Player.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-4" />
-    <option name="width" value="1934" />
-    <option name="height" value="1030" />
+    <option name="x" value="-11" />
+    <option name="y" value="-11" />
+    <option name="width" value="1942" />
+    <option name="height" value="1042" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -187,6 +191,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -202,12 +207,19 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Make_ten_2" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Make_ten_2" />
+      </console-settings>
+    </option>
   </component>
   <component name="RunManager" selected="Python.Player">
     <configuration default="false" name="Player" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -589,7 +601,14 @@
       <option name="project" value="LOCAL" />
       <updated>1487694331096</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Minor Change&#10;">
+      <created>1488055876727</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1488055876727</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TodoView">
@@ -602,15 +621,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="0" width="1934" height="1030" extended-state="0" />
+    <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3299735" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.05994695" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5744417" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.60173696" sideWeight="0.5039788" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.8318584" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.98630136" sideWeight="0.49814323" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34134007" sideWeight="0.4960212" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.83063513" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42216688" sideWeight="0.49814323" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.52552927" sideWeight="0.4960212" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2519894" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.8542964" sideWeight="0.4960212" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -682,19 +701,20 @@
     <MESSAGE value="fixed some bugs&#10;" />
     <MESSAGE value="Cython追加" />
     <MESSAGE value="Minor change　更に高速化" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor change　更に高速化" />
+    <MESSAGE value="Minor Change&#10;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor Change&#10;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Player.py</url>
-          <line>175</line>
+          <line>183</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GUIBoard.py</url>
-          <line>299</line>
+          <line>303</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
       </breakpoints>
@@ -710,23 +730,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Game.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="775">
-          <caret line="31" column="24" lean-forward="false" selection-start-line="31" selection-start-column="24" selection-end-line="31" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Player.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-          <folding>
-            <element signature="e#18#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Board.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1020,27 +1023,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CBoard.pyx">
+    <entry file="file://$PROJECT_DIR$/CBoard.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+        <state relative-caret-position="716">
+          <caret line="2044" column="0" lean-forward="true" selection-start-line="2044" selection-start-column="0" selection-end-line="2044" selection-end-column="0" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GUIBoard.py">
+    <entry file="file://$PROJECT_DIR$/Py-CBoard.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25">
-          <caret line="269" column="22" lean-forward="false" selection-start-line="269" selection-start-column="22" selection-end-line="269" selection-end-column="22" />
-          <folding>
-            <element signature="e#27#37#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="716">
+          <caret line="146" column="20" lean-forward="true" selection-start-line="146" selection-start-column="20" selection-end-line="146" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CBoard.pyx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="500">
+          <caret line="20" column="27" lean-forward="true" selection-start-line="20" selection-start-column="27" selection-end-line="20" selection-end-column="27" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Board.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="538">
+        <state relative-caret-position="426">
           <caret line="86" column="30" lean-forward="false" selection-start-line="86" selection-start-column="30" selection-end-line="86" selection-end-column="30" />
           <folding>
             <element signature="e#27#45#0" expanded="true" />
@@ -1048,10 +1055,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/GUIBoard.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="537">
+          <caret line="314" column="26" lean-forward="false" selection-start-line="314" selection-start-column="26" selection-end-line="314" selection-end-column="26" />
+          <folding>
+            <element signature="e#27#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Game.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="23" column="50" lean-forward="false" selection-start-line="23" selection-start-column="50" selection-end-line="23" selection-end-column="50" />
+        <state relative-caret-position="374">
+          <caret line="22" column="51" lean-forward="true" selection-start-line="22" selection-start-column="51" selection-end-line="22" selection-end-column="51" />
           <folding>
             <element signature="e#18#31#0" expanded="true" />
           </folding>
@@ -1060,8 +1077,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Player.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="632">
-          <caret line="267" column="0" lean-forward="true" selection-start-line="267" selection-start-column="0" selection-end-line="267" selection-end-column="0" />
+        <state relative-caret-position="18">
+          <caret line="256" column="14" lean-forward="true" selection-start-line="256" selection-start-column="14" selection-end-line="256" selection-end-column="14" />
           <folding>
             <element signature="e#18#31#0" expanded="true" />
           </folding>

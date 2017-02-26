@@ -1,15 +1,34 @@
-
+# coding: utf-8
 #cython: profile=True
 # distutils: define_macros=CYTHON_TRACE_NOGIL=1
 """Cython用のクラス"""
 import random
-
+from libc.stdlib cimport rand
 
 cdef int WALL = -1
 
-
 cdef random_next(int max_board):
-    """盤面の最大の数字がmax_boardのとき、埋める数字から確率的に傾斜をかけてひとつ選び返す"""
+
+    cdef int max_num
+
+    if max_board <= 5:  # 盤面の数字が5以上の時は新しい数字は3が上限
+        max_num = 3
+    else:
+        max_num = max_board - 2  # 盤面の数字が6以上の時は新しい数字はn-2が上限
+
+    cdef int s = int((max_num * (max_num + 1)) / 2)
+    #cdef int r = random.randint(0, s - 1)
+    cdef int r = rand() % s
+    cdef int k = 0
+    cdef int i
+    for i in range(max_num):
+        k += max_num - i
+        if r < k:
+            return i + 1
+
+"""
+cdef random_next(int max_board):
+    # 盤面の最大の数字がmax_boardのとき、埋める数字から確率的に傾斜をかけてひとつ選び返す
 
     cdef int max_num
 
@@ -32,7 +51,7 @@ cdef random_next(int max_board):
         s += p
         if r < s:
             return k
-
+"""
 
 cdef make_adjacent(int TABLE_SIZE):
     #adjacent = [[0] * 4 for i in range(TABLE_SIZE ** 2)]
@@ -154,8 +173,9 @@ cdef class Board:
                 a = self.board[i]
 
         return a
-    def clone(self):
 
+    def clone(self):
+        cdef int i
         new_board = Board(table_size=self.TABLE_SIZE)
         for i in range(self.TABLE_SIZE ** 2):
             new_board.board[i] = self.board[i]
@@ -198,6 +218,7 @@ cdef class Board:
         #self.connected_ = []
         #intiialize self.conncected. 0 represents it it not connected, 1 represents it is connected
         cdef int i
+        cdef int selected_cell
         for i in range(self.TABLE_SIZE ** 2):
             self.connected[i] = 0
 
@@ -260,5 +281,6 @@ def test(n):
         board.init_board()
         if len(board.selectable_list()) != 0:
             board.select_cell(board.selectable_list()[0])
+
 
 

@@ -3,10 +3,10 @@
 
 import random
 import numpy as np
-import Board
 import Game
 import matplotlib.pyplot as plt
 import time
+import seaborn
 
 
 class Player(object):
@@ -19,7 +19,6 @@ class Player(object):
         pass
 
 
-# In[7]:
 
 class Random(object):
     """Randomに選ぶAIのクラス"""
@@ -39,9 +38,12 @@ class Human(object):
         pass
 
     def next_cell(self, board):
-        """boardを受け取り、次に選択するcellの座標をタプルで返す。入力は3, 4のようにタプルで。おけるようになるまでやりなおさせる。ゲームをやめる場合"C"を入力しFalseを返す"""
+        """boardを受け取り、次に選択するcellの座標をタプルで返す。
+        入力は3, 4のようにタプルで。おけるようになるまでやりなおさせる。
+        ゲームをやめる場合"C"を入力しFalseを返す"""
         while True:
-            a = input(u"座標を入力してください。(例)3, 4。Cを入力すると中断します。")
+            a = input(u"座標を入力してください。"
+                      u"(例)3, 4。Cを入力すると中断します。")
             if a == "C":  # Cが入力されたら中断
                 return False
 
@@ -53,7 +55,8 @@ class Human(object):
                     return x, y
 
                 else:
-                    print(u"選べる座標を選んでください。選べる座標は", board.selectable_list(), u"です")
+                    print(u"選べる座標を選んでください。選べる座標は",
+                          board.selectable_list(), u"です")
             except ValueError:
                 print(u"正しい座標を入力してください")
 
@@ -64,7 +67,8 @@ class MonteCarlo(object):
     def __init__(self, repeat=5):
         """repeatの数だけランダム試行を行う
             self.eval_list : list
-                プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
+                プレイ時のそれぞれの局面での評価値(a, ma)
+                {a: 最大の数字,ma：ゲーム終了までのターン数}
             self.game_num : int
                 プレイしたゲーム数の合計
         """
@@ -108,18 +112,21 @@ class MonteCarlo(object):
 
             new_board = current_board.clone()
             new_board.select_cell(cell)
-            result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
+            result = (Game.Game(Random()).play(board=new_board,
+                                               result=False))  # 実際にプレイをする
             result_max.append(result[2])
             result_turn.append(result[1])
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
-        return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
+        return (float(sum(result_turn)) / len(result_turn),
+                float(sum(result_max)) / len(result_max))
 
 
 class MonteCarloSecond(object):
     def __init__(self, second=0.5, turn_weight=0.01):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             self.eval_list : list
-                プレイ時のそれぞれの局面での評価値(a, ma){a: 最大の数字,ma：ゲーム終了までのターン数}
+                プレイ時のそれぞれの局面での評価値(a, ma)
+                {a: 最大の数字,ma：ゲーム終了までのターン数}
             self.game_num : int
                 合計で何ゲームプレイしたか
             self.num_try: list
@@ -149,7 +156,8 @@ class MonteCarloSecond(object):
         best_cell = (10, 10)
         for a in board.selectable_list():  # それぞれの選択肢において
             self.repeat = 0
-            eva = self.monte_eval(a, board_eval)  # その選択肢の評価値 eva(turn_number, max_num)
+            eva = self.monte_eval(a, board_eval)
+            # その選択肢の評価値 eva(turn_number, max_num)
             """
             if eva[1] > ma[1]:  # 最大の数字が過去最高の時
                 ma = eva
@@ -178,13 +186,15 @@ class MonteCarloSecond(object):
         while time.clock() - start_time < self.second_each_:
             new_board = current_board.clone()
             new_board.select_cell(cell)
-            result = (Game.Game(Random()).play(board=new_board, result=False))  # 実際にプレイをする
+            result = (Game.Game(Random()).play(board=new_board,
+                                               result=False))  # 実際にプレイをする
             result_max.append(result[2])
             result_turn.append(result[1])
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
             self.repeat += 1
 
-        return float(sum(result_turn)) / len(result_turn), float(sum(result_max)) / len(result_max)
+        return (float(sum(result_turn)) / len(result_turn),
+                float(sum(result_max)) / len(result_max))
 
 
 def main(n):
@@ -198,7 +208,8 @@ def main(n):
         for j in range(5):
             print("parameter i: %d\n try number: %d" % (i, j))
             # i番目のParameterでPlayした結果を格納. result= [board, turn_num, max_board]
-            new_game = Game.Game(MonteCarloSecond(second=0.5, turn_weight=parameters[i]))
+            new_game = Game.Game(MonteCarloSecond(second=0.5,
+                                                  turn_weight=parameters[i]))
             result = new_game.play()
             max_history_row.append(result[2])
             turn_num_row.append(result[1])
@@ -216,13 +227,15 @@ def main(n):
 
     plt.subplot(211)
     plt.plot(parameters, max_means)
-    plt.fill_between(parameters, max_means + max_std, max_means - max_std, alpha=0.1)
+    plt.fill_between(parameters, max_means + max_std,
+                     max_means - max_std, alpha=0.1)
     plt.xlabel("parameter")
     plt.ylabel("max_num")
     plt.grid()
     plt.subplot(212)
     plt.plot(parameters, turn_num_means)
-    plt.fill_between(parameters, turn_num_means + turn_num_std, turn_num_means - turn_num_std, alpha=0.1)
+    plt.fill_between(parameters, turn_num_means + turn_num_std,
+                     turn_num_means - turn_num_std, alpha=0.1)
     plt.xlabel("parameter")
     plt.ylabel("turn_num")
     plt.grid()
@@ -244,11 +257,13 @@ def test_second():
     plt.grid()
     plt.show()
 
+
 def show_expectation():
-    player1 = MonteCarloSecond(second=1.0, turn_weight=0.01)
+    player1 = MonteCarloSecond(second=0.5, turn_weight=0.01)
     new_game = Game.Game(player1)
     new_game.play(show=True)
-    expectation =   np.array(player1.eval_list) # expectation[:,0] : turn_num, expectation[:,1]:max_num
+    expectation = np.array(player1.eval_list)
+    # expectation[:,0] : turn_num, expectation[:,1]:max_num
     plt.subplot(211)
     plt.plot(expectation[:, 0], label="Turn Number")
     plt.ylabel("Turn Number")
@@ -260,7 +275,6 @@ def show_expectation():
     plt.grid()
     plt.legend()
     plt.show()
-
 
 
 if __name__ == "__main__":

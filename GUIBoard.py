@@ -15,6 +15,7 @@ import Player
 
 
 class App(QWidget):
+
     def __init__(self):
         super().__init__()
         self.GUIBoard = GUIBoard()
@@ -208,7 +209,8 @@ class GUIBoard(QFrame):
                 next_c = self.player.next_cell(self.Board)
 
                 # draw before_drop
-                self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
+                self.Board_drawn = self.Board.select_cell(
+                    next_c, return_board_before_drop=True)
                 self.drop_timer.start()
 
                 # draw after_drop
@@ -257,7 +259,8 @@ class GUIBoard(QFrame):
             # if cell is selectable
             if cell in self.Board.selectable_list():
                 next_c = cell
-                self.Board_drawn = self.Board.select_cell(next_c, return_board_before_drop=True)
+                self.Board_drawn = self.Board.select_cell(
+                    next_c, return_board_before_drop=True)
 
                 if not self.Board.is_game_end():
                     self.drop_timer.start()
@@ -271,7 +274,6 @@ class GUIBoard(QFrame):
         """GUIBoardのUIの初期化"""
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
 
-
     def _get_cell_size(self):
         """それぞれのマスの大きさをピクセル数で返す"""
         return GUIBoard.BOARD_SIZE // self.Board.get_table_size()
@@ -282,18 +284,21 @@ class GUIBoard(QFrame):
 
     def _draw_a_cell(self, painter, i, j, value):
         """Draw cell(i, j), value is the number of the cell"""
-        colorTable = ["white", "#01bfa6", "#0b9cdb", "#ff5d1a",
-                      "#ffa81b", "#f22c43", "#7b50ff", "#e33b92", "black", "green", "yellow", "orange"]
+        color_table = ["white", "#01bfa6", "#0b9cdb", "#ff5d1a",
+                       "#ffa81b", "#f22c43", "#7b50ff", "#e33b92",
+                       "black", "green", "yellow", "orange"]
 
-        color = QColor(colorTable[value])
-        painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size(),
+        color = QColor(color_table[value])
+        painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(),
+                         self._get_cell_size(),
                          self._get_cell_size(), color)
 
         font = QFont("Times", 0.20 * self._get_cell_size())
         painter.setFont(font)
         pen_color = QColor("white")
         painter.setPen(pen_color)
-        painter.drawText(j * self._get_cell_size(), i * self._get_cell_size(), self._get_cell_size() - 1,
+        painter.drawText(j * self._get_cell_size(), i * self._get_cell_size(),
+                         self._get_cell_size() - 1,
                          self._get_cell_size() - 1,
                          Qt.AlignCenter, str(value))
 
@@ -301,11 +306,10 @@ class GUIBoard(QFrame):
         painter = QPainter(self)
         board_drawn = board.get_board()
 
-
         for i in range(self.Board.get_table_size()):
             for j in range(self.Board.get_table_size()):
-
-                self._draw_a_cell(painter, i, j, board_drawn[i * self.Board.get_table_size() + j])
+                self._draw_a_cell(painter, i, j,
+                                  board_drawn[i * self.Board.get_table_size() + j])
 
 
 if __name__ == "__main__":

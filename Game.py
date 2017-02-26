@@ -2,8 +2,8 @@
 
 
 import CBoard
-import Board
 import Player
+
 
 # In[10]:
 
@@ -20,10 +20,9 @@ class Game(object):
         resultがTrueの時は終了後のみ盤面と最高の数字を表示する。
         また、boardを指定した場合、始めの局面がboardから始まる"""
         if not board:
-
-            game_board = CBoard.Board(table_size=4)
+            game_board = CBoard.Board(table_size=5)
             game_board.init_board()
-        if board:
+        else:
             game_board = board.clone()  # boardを指定した場合には始めの盤面がboardから始める。
         n = 0
         while n < 100000:
@@ -69,8 +68,4 @@ def play():
 
 
 if __name__ == "__main__":
-    graphviz = GraphvizOutput()
-    graphviz.output_file = "profile.png"
-    with PyCallGraph(output=graphviz):
-        play()
-
+    play()
