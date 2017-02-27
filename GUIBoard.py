@@ -309,7 +309,8 @@ class GUIBoard(QFrame):
         for i in range(self.Board.get_table_size()):
             for j in range(self.Board.get_table_size()):
                 self._draw_a_cell(painter, i, j,
-                                  board_drawn[i * self.Board.get_table_size() + j])
+                                  board_drawn[i *
+                                              self.Board.get_table_size() + j])
 
 
 if __name__ == "__main__":

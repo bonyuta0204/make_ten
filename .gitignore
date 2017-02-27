@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/
+__pycache__/
+build/
+kernprof.py
+memo.txt
+parameter1.png
+Player.py.lprof
+*~

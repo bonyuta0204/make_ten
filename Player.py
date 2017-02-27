@@ -19,7 +19,6 @@ class Player(object):
         pass
 
 
-
 class Random(object):
     """Randomに選ぶAIのクラス"""
 
