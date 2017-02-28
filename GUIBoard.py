@@ -15,7 +15,6 @@ import Player
 
 
 class App(QWidget):
-
     def __init__(self):
         super().__init__()
         self.GUIBoard = GUIBoard()
@@ -162,8 +161,10 @@ class App(QWidget):
             self.is_game_over_label.clear()
 
     def table_size_change(self, text):
+
+        # self.GUIBoard.Board = CBoard.Board(table_size=int(text))
+        self.GUIBoard.table_size = int(text)
         self.GUIBoard.init_board()
-        self.GUIBoard.Board = CBoard.Board(table_size=int(text))
         self.GUIBoard.Board.init_board()
         self.GUIBoard.Board_drawn = self.GUIBoard.Board
 
@@ -188,10 +189,11 @@ class GUIBoard(QFrame):
         super().__init__()
 
         self.init_ui()
+        self.table_size = 4
         self.init_board()
 
     def init_board(self):
-        self.Board = CBoard.Board()
+        self.Board = CBoard.Board(table_size=self.table_size)
         self.Board.init_board()
         self.is_paused = True
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
@@ -286,7 +288,7 @@ class GUIBoard(QFrame):
         """Draw cell(i, j), value is the number of the cell"""
         color_table = ["white", "#01bfa6", "#0b9cdb", "#ff5d1a",
                        "#ffa81b", "#f22c43", "#7b50ff", "#e33b92",
-                       "black", "green", "yellow", "orange"]
+                       "black", "green", "blue", "orange", "red", "indigo", "peru"]
 
         color = QColor(color_table[value])
         painter.fillRect(j * self._get_cell_size(), i * self._get_cell_size(),
