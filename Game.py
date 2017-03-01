@@ -56,7 +56,8 @@ class Game(object):
 
                 else:
                     pass
-                return game_board.get_board(), game_board.get_turn_num(), game_board.max_board()
+                return (game_board.get_board(), game_board.get_turn_num(),
+                        game_board.max_board(), game_board.get_max_adjacent())
 
 
 def play():

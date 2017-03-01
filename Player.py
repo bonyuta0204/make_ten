@@ -134,6 +134,7 @@ class MonteCarloSecond(object):
                 turn数にかける重み
         """
         self.parameter = second
+        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max adjacent)
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
@@ -141,9 +142,10 @@ class MonteCarloSecond(object):
         self.name = "MonteCarloSecond"
 
     def next_cell(self, board):
-        """モンテカルロ法の評価値が一番高かった手を返す
+        """
+        モンテカルロ法の評価値が一番高かった手を返す
 
-        。"""
+        """
         # 評価用に新しいBoardをつくる
 
         board_eval = board.clone()
@@ -156,18 +158,10 @@ class MonteCarloSecond(object):
         for a in board.selectable_list():  # それぞれの選択肢において
             self.repeat = 0
             eva = self.monte_eval(a, board_eval)
-            # その選択肢の評価値 eva(turn_number, max_num)
-            """
-            if eva[1] > ma[1]:  # 最大の数字が過去最高の時
-                ma = eva
-                best_cell = a
+            # その選択肢の評価値 eva(turn_number, max_num, max_adjacent)
 
-            elif eva[1] == ma[1]:  # 最大の数字が同列一位の時はターン数が多い方を優先
-                if eva[0] > ma[0]:
-                    ma = eva
-                    best_cell = a
-                """
-            score = self.turn_weight * eva[0] + eva[1]
+            # score = self.turn_weight * eva[0] + eva
+            score = eva[1] + 0.1 * eva[2] + 0.02 * eva[0]
             if score > max_score:
                 max_score = score
                 best_cell = a
@@ -181,6 +175,7 @@ class MonteCarloSecond(object):
         """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
+        result_max_adjacent = [] # 最大セルに隣接するセルの最大値のリスト
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
             new_board = current_board.clone()
@@ -189,11 +184,13 @@ class MonteCarloSecond(object):
                                                result=False))  # 実際にプレイをする
             result_max.append(result[2])
             result_turn.append(result[1])
+            result_max_adjacent.append(result[3])
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
             self.repeat += 1
 
         return (float(sum(result_turn)) / len(result_turn),
-                float(sum(result_max)) / len(result_max))
+                float(sum(result_max)) / len(result_max),
+                float(sum(result_max_adjacent) / len(result_max_adjacent)))
 
 
 def main(n):
@@ -264,15 +261,15 @@ def show_expectation():
     expectation = np.array(player1.eval_list)
     # expectation[:,0] : turn_num, expectation[:,1]:max_num
     plt.subplot(211)
-    plt.plot(expectation[:, 0], label="Turn Number")
-    plt.ylabel("Turn Number")
-    plt.grid()
+    plt.plot(expectation[:, 0], label="turn number")
+    plt.grid(True)
     plt.legend()
     plt.subplot(212)
     plt.plot(expectation[:, 1], label="Max Number")
     plt.ylabel("Max Number")
-    plt.grid()
-    plt.legend()
+    plt.plot(expectation[:, 2], label="Max Adjacent")
+    plt.legend(loc="best")
+    plt.grid(True)
     plt.show()
 
 

@@ -1,5 +1,5 @@
 # coding: utf-8
-#cython: profile=True
+# cython: profile=True
 # distutils: define_macros=CYTHON_TRACE_NOGIL=1
 """Cython用のクラス"""
 import random
@@ -17,7 +17,6 @@ cdef random_next(int max_board):
         max_num = max_board - 2  # 盤面の数字が6以上の時は新しい数字はn-2が上限
 
     cdef int s = int((max_num * (max_num + 1)) / 2)
-    #cdef int r = random.randint(0, s - 1)
     cdef int r = rand() % s
     cdef int k = 0
     cdef int i
@@ -26,36 +25,7 @@ cdef random_next(int max_board):
         if r < k:
             return i + 1
 
-"""
-cdef random_next(int max_board):
-    # 盤面の最大の数字がmax_boardのとき、埋める数字から確率的に傾斜をかけてひとつ選び返す
-
-    cdef int max_num
-
-    if max_board <= 5:  # 盤面の数字が5以上の時は新しい数字は3が上限
-        max_num = 3
-    else:
-        max_num = max_board - 2  # 盤面の数字が6以上の時は新しい数字はn-2が上限
-
-    prob = {}
-    cdef int s = 0
-    cdef int k, p,r
-    cdef int i, j
-    for i in range(1, max_num + 1):
-        prob[i] = max_num + 1 - i
-    for k, p in prob.items():
-        s += p
-    r = random.uniform(0, s)
-    s = 0
-    for k, p in prob.items():
-        s += p
-        if r < s:
-            return k
-"""
-
 cdef make_adjacent(int TABLE_SIZE):
-    #adjacent = [[0] * 4 for i in range(TABLE_SIZE ** 2)]
-    #adjacent = np.zeros((TABLE_SIZE ** 2, 4), dtype=np.int32)
     cdef int adjacent[100][4]
     # すべてのマスに対して
 
@@ -90,19 +60,16 @@ cdef class Board:
     cdef int turn_number
     cdef int connected[100]
 
-
     def __init__(self, table_size=4):
         """board"""
-        #self.board = np.zeros(Board.TABLE_SIZE ** 2, dtype=np.int32)
         cdef int i
         self.TABLE_SIZE = table_size
 
         for i in range(self.TABLE_SIZE ** 2):
-                self.board[i] = 0
+            self.board[i] = 0
         self.selectable = []
         self.turn_number = 0
         self.ADJACENT = make_adjacent(self.TABLE_SIZE)
-
 
     def init_board(self):
         """randomly init board"""
@@ -126,13 +93,14 @@ cdef class Board:
         return self.selectable
 
     def select_cell(self, cell, return_board_before_drop=False):
-        """実際にCellを返す。return_board_before_drop=Trueのときは実際に数字を落とす前の状態のboardを返す(描画用)"""
+        """実際にCellを返す。
+           return_board_before_drop=Trueのときは実際に数字を落とす前の状態のboardを返す(描画用)"""
         # 選んだCellとつながっているCellを0にする。選んだCellは値を1増やす
         self._erace_connected(cell)
 
         if return_board_before_drop:
             # Selfのコピーを返す
-            board_before_drop =  self.clone()
+            board_before_drop = self.clone()
         # 数字を落とす
         self._drop()
 
@@ -144,6 +112,7 @@ cdef class Board:
         self._selectable_list()
         if return_board_before_drop:
             return board_before_drop
+
     def set_board(self, given_board):
         """boardに外からあたえられたboardをセットする"""
         cdef int i
@@ -199,11 +168,29 @@ cdef class Board:
             else:
                 break
 
+    def get_max_adjacent(self):
+        """最大の値のセルの隣のセルの値の最大値を返す"""
+        # 最大値をもつセルの番号を返す
+        max_num = self.max_board()
+        max_cells = []
+        for i in range(self.TABLE_SIZE ** 2):
+            if self.board[i] == max_num:
+                max_cells.append(i)
+        max_adjacent = 0
+        for cell in max_cells:
+            for j in range(4):
+                if self.ADJACENT[cell][j] != -1 and self.board[self.ADJACENT[cell][j]] > max_adjacent:
+                    max_adjacent = self.board[self.ADJACENT[cell][j]]
+        return max_adjacent
+
+
+        # 最大値のセルのAdjacentの最大値を返す
+
 
     cdef _selectable_list(self):
         """Boardからselectable list を作る"""
         selectable_list = []
-        cdef int T = self.TABLE_SIZE **2
+        cdef int T = self.TABLE_SIZE ** 2
         cdef int i, j
         for i in range(T):
             for j in range(4):
@@ -215,8 +202,8 @@ cdef class Board:
 
     cdef _erace_connected(self, cell):
         """ 選んだCellとつながっているCellを0にする。選んだCellは値を1増やす"""
-        #self.connected_ = []
-        #intiialize self.conncected. 0 represents it it not connected, 1 represents it is connected
+        # intiialize self.conncected. 0 represents it it not connected, 1
+        # represents it is connected
         cdef int i
         cdef int selected_cell
         for i in range(self.TABLE_SIZE ** 2):
@@ -225,14 +212,13 @@ cdef class Board:
         self._connected(cell)
         selected_cell = self.board[cell]
         # for connected_cell in self.connected_:
-           # self.board[connected_cell] = 0
+        # self.board[connected_cell] = 0
         for i in range(self.TABLE_SIZE ** 2):
             if self.connected[i] == 1:
-                self.board[i] =0
+                self.board[i] = 0
         self.board[cell] += selected_cell + 1
 
     cdef _drop(self):
-        #new_board = np.zeros(self.TABLE_SIZE ** 2)
         cdef int new_board[100]
         cdef int i, j, k
         cdef int T = self.TABLE_SIZE
@@ -244,10 +230,10 @@ cdef class Board:
             for i in range(T):
                 # (T-1-i, j)(下からi番目)
                 if self.board[(T - 1 - i) * T + j] != 0:
-                    new_board[(T - 1 - k) * T + j] = self.board[(T - 1 - i) * T + j]
+                    new_board[(T - 1 - k) * T +
+                              j] = self.board[(T - 1 - i) * T + j]
                     k += 1
         self.board = new_board
-
 
     cdef _renew_board(self):
         """0になっているところをランダムに埋める"""
@@ -263,12 +249,10 @@ cdef class Board:
         cdef int adj
         cdef int j
         for j in range(4):
-            adj =  self.ADJACENT[cell][j]
+            adj = self.ADJACENT[cell][j]
             if adj != WALL:
-                #if adj not in self.connected_ :
                 if self.connected[adj] != 1:
                     if self.board[cell] == self.board[adj]:
-                        #self.connected_.append(adj)
                         self.connected[adj] = 1
                         self._connected(adj)
 
@@ -281,6 +265,3 @@ def test(n):
         board.init_board()
         if len(board.selectable_list()) != 0:
             board.select_cell(board.selectable_list()[0])
-
-
-

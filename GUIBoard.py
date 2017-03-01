@@ -230,7 +230,7 @@ class GUIBoard(QFrame):
         self.Board_drawn = self.Board
         self.update()
         self.turn_change.emit(self.Board.get_turn_num())
-        QTimer.singleShot(100, self.step)
+        QTimer.singleShot(200, self.step)
 
     def start(self):
         """AIをスタートする"""
