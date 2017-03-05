@@ -3,10 +3,9 @@
 # In[1]:
 
 import sys
-import Board
 import CBoard
 
-from PyQt5.QtWidgets import (QWidget, QApplication, QFrame, QMainWindow,
+from PyQt5.QtWidgets import (QWidget, QApplication, QFrame,
                              QPushButton, QHBoxLayout, QVBoxLayout, QLabel,
                              QComboBox, QGroupBox, QLineEdit, QGridLayout)
 from PyQt5.QtGui import QPainter, QColor, QFont
@@ -192,7 +191,8 @@ class GUIBoard(QFrame):
         self.table_size = 4
         self.init_board()
 
-    def init_board(self):
+    def init_board(self, board=None):
+        i
         self.Board = CBoard.Board(table_size=self.table_size)
         self.Board.init_board()
         self.is_paused = True
@@ -250,6 +250,7 @@ class GUIBoard(QFrame):
     def mouse_step(self, x, y):
         """select cell which is clicked by mouse"""
         # get number of clicked cell
+        cell = -1
         if not self.Board.is_game_end():
             cell_size = self._get_cell_size()
             table_size = self.Board.get_table_size()

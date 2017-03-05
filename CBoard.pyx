@@ -8,7 +8,14 @@ from libc.stdlib cimport rand
 cdef int WALL = -1
 
 cdef random_next(int max_board):
-
+    """
+    盤面を埋める数字を確率に従って返す
+        parameter:
+            max_board: int
+                その時の盤面の最大の値
+        return:
+            int:　確率的に選ばれた整数
+    """
     cdef int max_num
 
     if max_board <= 5:  # 盤面の数字が5以上の時は新しい数字は3が上限
@@ -60,7 +67,7 @@ cdef class Board:
     cdef int turn_number
     cdef int connected[100]
 
-    def __init__(self, table_size=4):
+    def __init__(self, int table_size=4):
         """board"""
         cdef int i
         self.TABLE_SIZE = table_size
@@ -71,23 +78,44 @@ cdef class Board:
         self.turn_number = 0
         self.ADJACENT = make_adjacent(self.TABLE_SIZE)
 
-    def init_board(self):
-        """randomly init board"""
-        for i in range(self.TABLE_SIZE ** 2):
-            self.board[i] = random.randint(1, 3)
+    def init_board(self, max_num=3):
+        """
+        randomly initialize board.
+        When max_num != 3, max number of initialized board will be max_num
+        Parameter:
+            max_num: int
+                その盤面に登場する最大の整数を指定する
+         Return:
+                None
+        """
+        if max_num == 3:
+            for i in range(self.TABLE_SIZE ** 2):
+                self.board[i] = random.randint(1, 3)
+        else:
+            for i in range(self.TABLE_SIZE ** 2):
+                self.board[i] = random_next(max_num + 2)
         self.selectable = []
         self.turn_number = 0
 
     def print_board(self):
-
+        """
+        Print board in formatted way
+        """
         for i in range(self.TABLE_SIZE):
             row = ""
             for j in range(self.TABLE_SIZE):
-                row += str(self.board[i * self.TABLE_SIZE + j])
+                n = "%2d" % self.board[i * self.TABLE_SIZE + j]
+                row += n
 
             print(row)
 
     def selectable_list(self):
+        """
+        Return list of cell number which is selectable in current board
+        Paremeter: None
+        Return: list
+            list of cell number which is selectable in current board
+        """
         if len(self.selectable) == 0:
             self._selectable_list()
         return self.selectable
@@ -144,11 +172,17 @@ cdef class Board:
         return a
 
     def clone(self):
+        """
+        clone current game board. just copy board and DO NOT copy turn number
+        Return:
+            instanse of CBoard : CBoard instanse which has same CBoard.board
+
+        """
         cdef int i
         new_board = Board(table_size=self.TABLE_SIZE)
         for i in range(self.TABLE_SIZE ** 2):
             new_board.board[i] = self.board[i]
-        new_board.turn_number = self.turn_number
+        new_board.turn_number = 0
         return new_board
 
     def is_game_end(self):
@@ -184,7 +218,13 @@ cdef class Board:
         return max_adjacent
 
 
-        # 最大値のセルのAdjacentの最大値を返す
+    def rand_choice(self):
+        """おけるセルからひとつ選ぶ"""
+        cdef int num_cell
+        cdef int r
+        num_cell = len(self.selectable_list())
+        r = rand() % num_cell
+        return self.selectable_list()[r]
 
 
     cdef _selectable_list(self):

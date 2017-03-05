@@ -27,7 +27,9 @@ class Random(object):
 
     def next_cell(self, board):
         """boardを受け取り、次に選択するcellの座標をタプルで返す"""
-        return random.choice(board.selectable_list())
+
+        return board.rand_choice()
+        # return random.choice(board.selectable_list)
 
 
 class Human(object):
@@ -244,9 +246,9 @@ def test():
     new_game.play(show=True)
 
 
-def test_second():
+def test_second(n):
     player1 = MonteCarloSecond(second=0.5)
-    new_game = Game.Game(player1)
+    new_game = Game.Game(player1, table_size=n)
     new_game.play(show=True)
     plt.plot(player1.num_try)
     plt.ylabel("number of try")
@@ -254,10 +256,12 @@ def test_second():
     plt.show()
 
 
-def show_expectation():
+def show_expectation(n=5, max_num=3):
     player1 = MonteCarloSecond(second=0.5, turn_weight=0.01)
-    new_game = Game.Game(player1)
-    new_game.play(show=True)
+    new_game = Game.Game(player1, table_size=n)
+
+    new_game.play(show=True, max_num=max_num)
+
     expectation = np.array(player1.eval_list)
     # expectation[:,0] : turn_num, expectation[:,1]:max_num
     plt.subplot(211)
@@ -274,4 +278,4 @@ def show_expectation():
 
 
 if __name__ == "__main__":
-    show_expectation()
+    show_expectation(6, max_num=8)
