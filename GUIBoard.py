@@ -191,10 +191,10 @@ class GUIBoard(QFrame):
         self.table_size = 4
         self.init_board()
 
-    def init_board(self, board=None):
-        i
+    def init_board(self):
+
         self.Board = CBoard.Board(table_size=self.table_size)
-        self.Board.init_board()
+        self.Board.init_board(max_num=9)
         self.is_paused = True
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
         self.Board_drawn = self.Board

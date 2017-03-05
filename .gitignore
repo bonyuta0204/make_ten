@@ -7,3 +7,5 @@ memo.txt
 parameter1.png
 Player.py.lprof
 *~
+*.c
+*.lprof

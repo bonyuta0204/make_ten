@@ -264,18 +264,26 @@ def show_expectation(n=5, max_num=3):
 
     expectation = np.array(player1.eval_list)
     # expectation[:,0] : turn_num, expectation[:,1]:max_num
-    plt.subplot(211)
-    plt.plot(expectation[:, 0], label="turn number")
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+
+    ax1.plot(expectation[:, 0], label="turn number")
+    ax1.grid(False)
+    plt.ylabel("Turn Number")
+
+    ax2.plot(expectation[:, 1], label="Max Number")
+    ax2.plot(expectation[:, 2], label="Max Adjacent")
+    plt.ylabel("Max Number")
+    plt.legend(loc="best")
+    ax2.grid(True)
+
+    ax3 = ax1.twinx()
+    ax3.plot(player1.num_try, label="Number of try", color="orange")
+    plt.ylabel("Number of try")
     plt.grid(True)
     plt.legend()
-    plt.subplot(212)
-    plt.plot(expectation[:, 1], label="Max Number")
-    plt.ylabel("Max Number")
-    plt.plot(expectation[:, 2], label="Max Adjacent")
-    plt.legend(loc="best")
-    plt.grid(True)
+
     plt.show()
 
 
 if __name__ == "__main__":
-    show_expectation(6, max_num=8)
+    show_expectation(6, max_num=10)
