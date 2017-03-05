@@ -1,3 +1,4 @@
+
 # coding: utf-8
 # cython: profile=True
 # distutils: define_macros=CYTHON_TRACE_NOGIL=1
@@ -217,6 +218,20 @@ cdef class Board:
                     max_adjacent = self.board[self.ADJACENT[cell][j]]
         return max_adjacent
 
+    def get_sum_adjacent(self):
+        """最大の値のセルの隣のセルの値の合計値を返す"""
+        # 最大値をもつセルの番号を返す
+        max_num = self.max_board()
+        max_cells = []
+        for i in range(self.TABLE_SIZE ** 2):
+            if self.board[i] == max_num:
+                max_cells.append(i)
+        sum_adjacent = 0
+        for cell in max_cells:
+            for j in range(4):
+                if self.ADJACENT[cell][j] != -1:
+                    sum_adjacent += self.board[self.ADJACENT[cell][j]]
+        return sum_adjacent
 
     def rand_choice(self):
         """おけるセルからひとつ選ぶ"""

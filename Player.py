@@ -160,10 +160,10 @@ class MonteCarloSecond(object):
         for a in board.selectable_list():  # それぞれの選択肢において
             self.repeat = 0
             eva = self.monte_eval(a, board_eval)
-            # その選択肢の評価値 eva(turn_number, max_num, max_adjacent)
+            # その選択肢の評価値 eva(turn_number, max_num, max_adjacent, sum_adjacent)
 
             # score = self.turn_weight * eva[0] + eva
-            score = eva[1] + 0.1 * eva[2] + 0.02 * eva[0]
+            score = eva[1] + 0.1 * (eva[2] + 0.3 * eva[3] + 0.2 * eva[0])
             if score > max_score:
                 max_score = score
                 best_cell = a
@@ -178,6 +178,7 @@ class MonteCarloSecond(object):
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
         result_max_adjacent = [] # 最大セルに隣接するセルの最大値のリスト
+        result_sum_adjacent = [] # 最大セルに隣接するセルの和
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
             new_board = current_board.clone()
@@ -187,12 +188,14 @@ class MonteCarloSecond(object):
             result_max.append(result[2])
             result_turn.append(result[1])
             result_max_adjacent.append(result[3])
+            result_sum_adjacent.append(result[4])
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
             self.repeat += 1
 
         return (float(sum(result_turn)) / len(result_turn),
                 float(sum(result_max)) / len(result_max),
-                float(sum(result_max_adjacent) / len(result_max_adjacent)))
+                float(sum(result_max_adjacent) / len(result_max_adjacent)),
+                float(sum(result_sum_adjacent) / len(result_sum_adjacent)))
 
 
 def main(n):
@@ -267,11 +270,13 @@ def show_expectation(n=5, max_num=3):
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 
     ax1.plot(expectation[:, 0], label="turn number")
-    ax1.grid(False)
+    ax1.grid(True)
     plt.ylabel("Turn Number")
 
     ax2.plot(expectation[:, 1], label="Max Number")
     ax2.plot(expectation[:, 2], label="Max Adjacent")
+    ax2.set_xticks(np.arange(0, len(expectation), 10))
+
     plt.ylabel("Max Number")
     plt.legend(loc="best")
     ax2.grid(True)
@@ -279,11 +284,16 @@ def show_expectation(n=5, max_num=3):
     ax3 = ax1.twinx()
     ax3.plot(player1.num_try, label="Number of try", color="orange")
     plt.ylabel("Number of try")
-    plt.grid(True)
+    plt.grid(False)
     plt.legend()
+
+    ax4 = ax2.twinx()
+    ax4.plot(expectation[:, 3], label="sum of adjacent", color="orange")
+    ax4.grid(False)
+    print(expectation)
 
     plt.show()
 
 
 if __name__ == "__main__":
-    show_expectation(6, max_num=10)
+    show_expectation(6, max_num=7)

@@ -194,12 +194,12 @@ class GUIBoard(QFrame):
     def init_board(self):
 
         self.Board = CBoard.Board(table_size=self.table_size)
-        self.Board.init_board(max_num=9)
+        self.Board.init_board(max_num=3)
         self.is_paused = True
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
         self.Board_drawn = self.Board
         self.drop_timer = QTimer(self)
-        self.drop_timer.setInterval(200)
+        self.drop_timer.setInterval(300)
         self.is_game_over.emit(False)
         self.drop_timer.timeout.connect(self.draw_dropped)
 
@@ -213,11 +213,14 @@ class GUIBoard(QFrame):
                 # draw before_drop
                 self.Board_drawn = self.Board.select_cell(
                     next_c, return_board_before_drop=True)
-                self.drop_timer.start()
 
-                # draw after_drop
+
+
                 # self.timer.start()
                 self.update()
+                # draw after_drop
+
+                self.drop_timer.start()
 
             else:
 

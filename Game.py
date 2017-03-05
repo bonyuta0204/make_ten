@@ -55,7 +55,8 @@ class Game(object):
                     print("Max number was" + str(game_board.max_board()))  # boardにMaximumを足す)
 
                 return (game_board.get_board(), game_board.get_turn_num(),
-                        game_board.max_board(), game_board.get_max_adjacent())
+                        game_board.max_board(), game_board.get_max_adjacent(),
+                        game_board.get_sum_adjacent())
 
 
 def play():
