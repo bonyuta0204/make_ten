@@ -199,7 +199,7 @@ class GUIBoard(QFrame):
         self.resize(GUIBoard.BOARD_SIZE, GUIBoard.BOARD_SIZE)
         self.Board_drawn = self.Board
         self.drop_timer = QTimer(self)
-        self.drop_timer.setInterval(300)
+        self.drop_timer.setInterval(200)
         self.is_game_over.emit(False)
         self.drop_timer.timeout.connect(self.draw_dropped)
 
@@ -233,7 +233,7 @@ class GUIBoard(QFrame):
         self.Board_drawn = self.Board
         self.update()
         self.turn_change.emit(self.Board.get_turn_num())
-        QTimer.singleShot(200, self.step)
+        QTimer.singleShot(100, self.step)
 
     def start(self):
         """AIをスタートする"""

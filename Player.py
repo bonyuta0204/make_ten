@@ -63,7 +63,7 @@ class Human(object):
 
 
 # In[9]:
-
+'''
 class MonteCarlo(object):
     def __init__(self, repeat=5):
         """repeatの数だけランダム試行を行う
@@ -120,7 +120,7 @@ class MonteCarlo(object):
             self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
         return (float(sum(result_turn)) / len(result_turn),
                 float(sum(result_max)) / len(result_max))
-
+'''
 
 class MonteCarloSecond(object):
     def __init__(self, second=0.5, turn_weight=0.01):
@@ -163,7 +163,7 @@ class MonteCarloSecond(object):
             # その選択肢の評価値 eva(turn_number, max_num, max_adjacent, sum_adjacent)
 
             # score = self.turn_weight * eva[0] + eva
-            score = eva[1] + 0.1 * (eva[2] + 0.3 * eva[3] + 0.2 * eva[0])
+            score = eva[1] + 0.001 * (eva[2] + 0.00 * eva[3] + 0.05 * eva[0])
             if score > max_score:
                 max_score = score
                 best_cell = a
@@ -196,6 +196,90 @@ class MonteCarloSecond(object):
                 float(sum(result_max)) / len(result_max),
                 float(sum(result_max_adjacent) / len(result_max_adjacent)),
                 float(sum(result_sum_adjacent) / len(result_sum_adjacent)))
+
+
+
+
+class MonteCarlo(object):
+    def __init__(self, repeat=10, turn_weight=0.01):
+        """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
+            repeat: int
+                それぞれのターンで試行を繰り返す回数
+
+            eval_list : list
+                プレイ時のそれぞれの局面での評価値(a, ma)
+                {a: 最大の数字,ma：ゲーム終了までのターン数}
+
+            game_num : int
+                合計で何ゲームプレイしたか
+
+            num_try: list
+                それぞれの局面で平均何回プレーして期待値をもとめたかのリスト
+
+            turn_weight : float
+                turn数にかける重み
+        """
+        self.parameter = repeat
+        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max adjacent)
+        self.eval_list = []
+        self.game_num = 0
+        self.num_try = []  # 何手目で平均何回プレーしたかの記録
+        self.turn_weight = turn_weight
+        self.name = "MonteCarlo"
+
+    def next_cell(self, board):
+        """
+        モンテカルロ法の評価値が一番高かった手を返す
+
+        """
+        # 評価用に新しいBoardをつくる
+
+        board_eval = board.clone()
+
+        # board_evalを使って実験をする
+        max_score = 0
+        best_cell = 0
+        for a in board.selectable_list():  # それぞれの選択肢において
+            self.repeat = 0
+            eva = self.monte_eval(a, board_eval)
+            # その選択肢の評価値 eva(turn_number, max_num, max_adjacent, sum_adjacent)
+
+            # score = self.turn_weight * eva[0] + eva
+            score = eva[1] + 0.001 * (eva[2] + 0.00 * eva[3] + 0.05 * eva[0])
+            if score > max_score:
+                max_score = score
+                best_cell = a
+                expectation = eva
+
+        self.eval_list.append(expectation)
+        self.num_try.append(self.parameter)
+        return best_cell
+
+    def monte_eval(self, cell, current_board):
+        """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
+        result_max = []  # 最大値のリスト
+        result_turn = []  # ターン数のリスト
+        result_max_adjacent = []    # 最大セルに隣接するセルの最大値のリスト
+        result_sum_adjacent = []    # 最大セルに隣接するセルの和
+        # start_time = time.clock()
+        # while time.clock() - start_time < self.second_each_:
+        for i in range(self.parameter):
+            new_board = current_board.clone()
+            new_board.select_cell(cell)
+            result = (Game.Game(Random()).play(board=new_board,
+                                               result=False))  # 実際にプレイをする
+            result_max.append(result[2])
+            result_turn.append(result[1])
+            result_max_adjacent.append(result[3])
+            result_sum_adjacent.append(result[4])
+            self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
+            self.repeat += 1
+
+        return (float(sum(result_turn)) / len(result_turn),
+                float(sum(result_max)) / len(result_max),
+                float(sum(result_max_adjacent) / len(result_max_adjacent)),
+                float(sum(result_sum_adjacent) / len(result_sum_adjacent)))
+
 
 
 def main(n):
@@ -260,7 +344,7 @@ def test_second(n):
 
 
 def show_expectation(n=5, max_num=3):
-    player1 = MonteCarloSecond(second=0.5, turn_weight=0.01)
+    player1 = MonteCarlo(repeat=50, turn_weight=0.01)
     new_game = Game.Game(player1, table_size=n)
 
     new_game.play(show=True, max_num=max_num)

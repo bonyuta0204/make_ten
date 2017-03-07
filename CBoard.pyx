@@ -231,7 +231,7 @@ cdef class Board:
             for j in range(4):
                 if self.ADJACENT[cell][j] != -1:
                     sum_adjacent += self.board[self.ADJACENT[cell][j]]
-        return sum_adjacent
+        return sum_adjacent / len(max_cells)
 
     def rand_choice(self):
         """おけるセルからひとつ選ぶ"""
