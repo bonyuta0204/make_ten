@@ -5,7 +5,6 @@ import CBoard
 import Player
 
 
-
 class Game(object):
     """Gameをプレイするクラス。プレイヤーを簡単にかえられるようにする。結果を表示できるようにする。"""
 
@@ -27,7 +26,8 @@ class Game(object):
             board; CBoard instanse
                 set initial board to designated board
             max_num: int
-                initialize board in a way that max number of init board is max_num
+                initialize board in a way that
+                max number of init board is max_num
         """
         if not board:
             game_board = CBoard.Board(table_size=self.table_size)
@@ -52,7 +52,8 @@ class Game(object):
                     print("play over!")
                     print("Turn" + str(game_board.get_turn_num()))
                     game_board.print_board()
-                    print("Max number was" + str(game_board.max_board()))  # boardにMaximumを足す)
+                    # boardにMaximumを足す
+                    print("Max number was" + str(game_board.max_board()))
 
                 return (game_board.get_board(), game_board.get_turn_num(),
                         game_board.max_board(), game_board.get_max_adjacent(),

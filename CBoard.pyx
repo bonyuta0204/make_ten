@@ -2,7 +2,11 @@
 # coding: utf-8
 # cython: profile=True
 # distutils: define_macros=CYTHON_TRACE_NOGIL=1
-"""Cython用のクラス"""
+
+"""
+Cython用のモジュール
+Boardクラスを提供する
+"""
 import random
 from libc.stdlib cimport rand
 
@@ -61,6 +65,25 @@ cdef make_adjacent(int TABLE_SIZE):
 
 
 cdef class Board:
+    """
+    盤面の状況および操作をするクラス。
+    attributeは直接アクセス不可能のため、get_attributeメソッドでアクセスする
+
+    attribute:
+        TABLE_SIZE: int
+            Boardの1辺のマスの数
+        ADJACENT: int[100][4]
+            それぞれのセルが隣接しているセルの番号。壁はWALL = -1であわらされるので、利用する際は
+            if ADJACENT[i][j] != WALL　を含めること
+        board: int[100]
+            Boardのセル。一次元に展開。i 行j 列はboard[i * TABLE_SIZE + j]となる
+        selectable: list
+            それぞれの局面で選択できるセルの番号のリスト
+        turn_number: int
+            現在のターン数
+        connected: int[100]
+            途中で使うよう
+    """
     cdef int TABLE_SIZE
     cdef int ADJACENT[100][4]
     cdef int board[100]
@@ -196,7 +219,7 @@ cdef class Board:
         """適当にプレイする"""
         self.init_board()
         while True:
-            if self.is_game_end() == False:
+            if not self.is_game_end():
                 self.select_cell(self.selectable_list()[0])
                 self.print_board()
                 print("")
@@ -214,8 +237,9 @@ cdef class Board:
         max_adjacent = 0
         for cell in max_cells:
             for j in range(4):
-                if self.ADJACENT[cell][j] != -1 and self.board[self.ADJACENT[cell][j]] > max_adjacent:
-                    max_adjacent = self.board[self.ADJACENT[cell][j]]
+                if self.ADJACENT[cell][j] != -1:
+                    if self.board[self.ADJACENT[cell][j]] > max_adjacent:
+                        max_adjacent = self.board[self.ADJACENT[cell][j]]
         return max_adjacent
 
     def get_sum_adjacent(self):
@@ -240,7 +264,6 @@ cdef class Board:
         num_cell = len(self.selectable_list())
         r = rand() % num_cell
         return self.selectable_list()[r]
-
 
     cdef _selectable_list(self):
         """Boardからselectable list を作る"""

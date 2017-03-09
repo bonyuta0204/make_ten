@@ -1,12 +1,11 @@
 # coding: utf-8
 
 
-import random
 import numpy as np
 import Game
 import matplotlib.pyplot as plt
 import time
-import seaborn
+import matplotlib.ticker as mticker
 
 
 class Player(object):
@@ -62,67 +61,8 @@ class Human(object):
                 print(u"正しい座標を入力してください")
 
 
-# In[9]:
-'''
-class MonteCarlo(object):
-    def __init__(self, repeat=5):
-        """repeatの数だけランダム試行を行う
-            self.eval_list : list
-                プレイ時のそれぞれの局面での評価値(a, ma)
-                {a: 最大の数字,ma：ゲーム終了までのターン数}
-            self.game_num : int
-                プレイしたゲーム数の合計
-        """
-        self.parameter = repeat
-        self.eval_list = []
-        self.game_num = 0
-        self.name = "MonteCarlo"
-
-    def next_cell(self, board):
-        """モンテカルロ法の評価値が一番高かった手を返す。"""
-        # 評価用に新しいBoardをつくる
-
-        board_eval = board.clone()
-        # board_evalを使って実験をする
-        ma = (-1, -1)
-        best_cell = (10, 10)
-        for a in board.selectable_list():  # それぞれの選択肢において
-            eva = self.monte_eval(a, board_eval)  # その選択肢の評価値
-
-            if eva[1] > ma[1]:  # 最大の数字が過去最高の時
-                ma = eva
-                best_cell = a
-
-            elif eva[1] == ma[1]:  # 最大の数字が同列一位の時はターン数が多い方を優先
-                if eva[0] > ma[0]:
-                    ma = eva
-                    best_cell = a
-
-            else:
-                pass
-
-        self.eval_list.append(ma)
-
-        return best_cell
-
-    def monte_eval(self, cell, current_board):
-        """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
-        result_max = []  # 最大値のリスト
-        result_turn = []  # ターン数のリスト
-        for i in range(self.parameter):  # 毎回インスタンスを生成しないといけない？タプルにすれば大丈夫？
-
-            new_board = current_board.clone()
-            new_board.select_cell(cell)
-            result = (Game.Game(Random()).play(board=new_board,
-                                               result=False))  # 実際にプレイをする
-            result_max.append(result[2])
-            result_turn.append(result[1])
-            self.game_num += 1  # 合計で何ゲームプレイしたのかを記録しておく
-        return (float(sum(result_turn)) / len(result_turn),
-                float(sum(result_max)) / len(result_max))
-'''
-
 class MonteCarloSecond(object):
+
     def __init__(self, second=0.5, turn_weight=0.01):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             self.eval_list : list
@@ -136,7 +76,8 @@ class MonteCarloSecond(object):
                 turn数にかける重み
         """
         self.parameter = second
-        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max adjacent)
+        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max
+        # adjacent)
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
@@ -152,7 +93,14 @@ class MonteCarloSecond(object):
 
         board_eval = board.clone()
         self.num_selectable_ = len(board.selectable_list())
-        self.second_each_ = self.parameter / float(self.num_selectable_)
+
+        # おける場所が５ヶ所以上の場合は、与えられた時間をおける場所で割る。
+        # おける場所が５こに満たない場合は与えられた時間を５で割る(数千回とかの無駄な繰り返しをなくす。)
+
+        if self.num_selectable_ >= 10:
+            self.second_each_ = self.parameter / float(self.num_selectable_)
+        else:
+            self.second_each_ = self.parameter / 10
 
         # board_evalを使って実験をする
         max_score = 0
@@ -163,7 +111,7 @@ class MonteCarloSecond(object):
             # その選択肢の評価値 eva(turn_number, max_num, max_adjacent, sum_adjacent)
 
             # score = self.turn_weight * eva[0] + eva
-            score = eva[1] + 0.001 * (eva[2] + 0.00 * eva[3] + 0.05 * eva[0])
+            score = eva[1] + 0.001 * (0.0 * eva[2] + 0.0 * eva[3] + 0.2 * eva[0])
             if score > max_score:
                 max_score = score
                 best_cell = a
@@ -171,14 +119,15 @@ class MonteCarloSecond(object):
 
         self.eval_list.append(expectation)
         self.num_try.append(float(self.repeat / self.num_selectable_))
+
         return best_cell
 
     def monte_eval(self, cell, current_board):
         """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
-        result_max_adjacent = [] # 最大セルに隣接するセルの最大値のリスト
-        result_sum_adjacent = [] # 最大セルに隣接するセルの和
+        result_max_adjacent = []  # 最大セルに隣接するセルの最大値のリスト
+        result_sum_adjacent = []  # 最大セルに隣接するセルの和
         start_time = time.clock()
         while time.clock() - start_time < self.second_each_:
             new_board = current_board.clone()
@@ -198,9 +147,8 @@ class MonteCarloSecond(object):
                 float(sum(result_sum_adjacent) / len(result_sum_adjacent)))
 
 
-
-
 class MonteCarlo(object):
+
     def __init__(self, repeat=10, turn_weight=0.01):
         """1ターンにSecondが終わるまで繰り返した値を評価値として使う。
             repeat: int
@@ -220,7 +168,8 @@ class MonteCarlo(object):
                 turn数にかける重み
         """
         self.parameter = repeat
-        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max adjacent)
+        # それぞれのターンでの評価値のTupleのList。eval_list[0] = (turn number, max number, max
+        # adjacent)
         self.eval_list = []
         self.game_num = 0
         self.num_try = []  # 何手目で平均何回プレーしたかの記録
@@ -245,7 +194,8 @@ class MonteCarlo(object):
             # その選択肢の評価値 eva(turn_number, max_num, max_adjacent, sum_adjacent)
 
             # score = self.turn_weight * eva[0] + eva
-            score = eva[1] + 0.001 * (eva[2] + 0.00 * eva[3] + 0.05 * eva[0])
+            # Parameters have to be adjusted
+            score = eva[1] + 0.001 * (eva[2] + 0.01 * eva[3] + 0.1 * eva[0])
             if score > max_score:
                 max_score = score
                 best_cell = a
@@ -259,8 +209,8 @@ class MonteCarlo(object):
         """cellのマスの評価値を算出する。(ターン数の合計,最大値の合計)を返す"""
         result_max = []  # 最大値のリスト
         result_turn = []  # ターン数のリスト
-        result_max_adjacent = []    # 最大セルに隣接するセルの最大値のリスト
-        result_sum_adjacent = []    # 最大セルに隣接するセルの和
+        result_max_adjacent = []  # 最大セルに隣接するセルの最大値のリスト
+        result_sum_adjacent = []  # 最大セルに隣接するセルの和
         # start_time = time.clock()
         # while time.clock() - start_time < self.second_each_:
         for i in range(self.parameter):
@@ -279,7 +229,6 @@ class MonteCarlo(object):
                 float(sum(result_max)) / len(result_max),
                 float(sum(result_max_adjacent) / len(result_max_adjacent)),
                 float(sum(result_sum_adjacent) / len(result_sum_adjacent)))
-
 
 
 def main(n):
@@ -344,22 +293,34 @@ def test_second(n):
 
 
 def show_expectation(n=5, max_num=3):
-    player1 = MonteCarlo(repeat=50, turn_weight=0.01)
+    # Create Data
+    player1 = MonteCarloSecond(second=0.5, turn_weight=0.01)
     new_game = Game.Game(player1, table_size=n)
 
     new_game.play(show=True, max_num=max_num)
 
     expectation = np.array(player1.eval_list)
     # expectation[:,0] : turn_num, expectation[:,1]:max_num
+
+    # Plot Dataauto
+    # with plt.xkcd():
+
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
 
-    ax1.plot(expectation[:, 0], label="turn number")
+    ax1.plot(expectation[:, 0], label="turn number", c="blue")
+    ax1.yaxis.set_major_locator(mticker.LinearLocator(10))
+    ax1.set_ylim(bottom=0)
     ax1.grid(True)
+
+    ax1.spines["top"].set_color("None")
     plt.ylabel("Turn Number")
 
     ax2.plot(expectation[:, 1], label="Max Number")
     ax2.plot(expectation[:, 2], label="Max Adjacent")
+    ax2.plot([], [], label="sum of adjacent", c="green")
     ax2.set_xticks(np.arange(0, len(expectation), 10))
+
+    ax2.spines["top"].set_color("None")
 
     plt.ylabel("Max Number")
     plt.legend(loc="best")
@@ -367,17 +328,25 @@ def show_expectation(n=5, max_num=3):
 
     ax3 = ax1.twinx()
     ax3.plot(player1.num_try, label="Number of try", color="orange")
+    ax3.plot([], [], label="Turn Number", c="blue")
     plt.ylabel("Number of try")
-    plt.grid(False)
+    ax3.spines["top"].set_color("None")
+    ax3.set_ylim(bottom=0)
+    ax3.grid(False)
+    ax3.yaxis.set_major_locator(mticker.LinearLocator(10))
     plt.legend()
 
     ax4 = ax2.twinx()
-    ax4.plot(expectation[:, 3], label="sum of adjacent", color="orange")
+    ax4.plot(expectation[:, 3], label="sum of adjacent", color="green")
+    ax4.set_ylabel("Sum of Adjacent")
+    ax4.spines["top"].set_color("None")
+
     ax4.grid(False)
+
     print(expectation)
 
     plt.show()
 
 
 if __name__ == "__main__":
-    show_expectation(6, max_num=7)
+    show_expectation(6, max_num=3)
